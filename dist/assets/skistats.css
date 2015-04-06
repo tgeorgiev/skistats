@@ -1,0 +1,92 @@
+.liftLegend {
+}
+
+.liftLegend .liftPath {
+  margin-right: 15px;
+  width: 20px;
+  border: 4px solid;
+  border-radius: 25%;
+  float: left;
+}
+
+.liftLegend .liftLabel {
+}
+
+.participantsLegend {
+}
+
+.participantsLegend .participantColor {
+  margin-right: 15px;
+  border: 4px solid;
+  border-radius: 50%;
+  float: left;
+}
+
+.participantsLegend .participantName, .participantsLegend .participantNameEdit {
+  padding: 0;
+  font: 10px sans-serif;
+}
+
+.lineContainer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: 1px;
+}
+
+.lineTop {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+  	width: 0; 
+	height: 0; 
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-top: 10px solid #08c;
+}
+  
+.lineBottom {
+    position: absolute;
+    bottom: -10px;
+    left: -10px;
+  	width: 0; 
+	height: 0; 
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-bottom: 10px solid #08c;
+}
+
+.lineLabel {
+  position:absolute;
+  padding:5px;
+  color:#000;
+  width: 100px;
+  bottom: -30px;
+  left: -55px;
+  background:#08c; /* default background for browsers without gradient support */
+  /* css3 */
+  background:-webkit-gradient(linear, 0 0, 0 100%, from(#08c), to(#47A9DA));
+  background:-moz-linear-gradient(#08c, #47A9DA);
+  background:-o-linear-gradient(#08c, #47A9DA);
+  background:linear-gradient(#08c, #47A9DA);
+  -webkit-border-radius:2px;
+  -moz-border-radius:2px;
+  border-radius:2px;
+}
+  
+.line {
+    background-color: #08c;
+    -webkit-box-shadow: 1px 1px 7px rgba(0,0,0,0.3);
+    -moz-box-shadow: 1px 1px 7px rgba(0,0,0,0.3);
+    box-shadow: 1px 1px 7px rgba(0,0,0,0.3);
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 1px;
+    top: 0;
+    bottom: 0;
+}
