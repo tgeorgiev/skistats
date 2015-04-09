@@ -23,7 +23,7 @@ d3.gantt = function() {
   var taskStatusColor = [];
   var displayedTasks;
 
-  var tickFormat = "%d/%m/%Y %H:%M:%S";
+  var tickFormat = "%d/%m/%Y %H:%M";
   var yTickFormatMapper;
 
   var keyFunction = function(d) {
@@ -38,7 +38,7 @@ d3.gantt = function() {
   var y = d3.scale.ordinal();
 
   var xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.time.format(tickFormat)).tickSubdivide(true)
-    .tickSize(8).tickPadding(4);
+    .tickSize(8).tickPadding(4).ticks(6);
 
   var yAxis = d3.svg.axis().scale(y).orient("right").tickSize(0);
 

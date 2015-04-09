@@ -3,18 +3,100 @@
  * Author: Tony Georgiev
  */
 
-/* === resets === */
+body {
+  font-family: 'Maven Pro', sans-serif;
+}
 
-/* === defaults === */
+.timelineContainer {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 200px;
+  height: 150px;
+  background-color:rgba(255,255,255,0.6);
+}
 
-/* === generic styles */
+.x.axis path,.x.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
 
-/* === layout === */
+.filesSelector p {
+  text-align: center;
+}
 
-/* === modules === */
+.filesSelectorButton {
+  position: relative;
+  width: 150px;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
+}
 
-/* === specific styles */
+.filesSelectorButton button {
+  padding: 10px;
+  width: 100%;
+  font-family: 'Maven Pro', sans-serif;
+  font-size: 20px;
+}
+.filesSelectorButton input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0;
+  filter: alpha(opacity=0);
+}
 
-/* === subsections === */
+.filesSelectorDrop {
+  border: 2px dashed;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  padding: 25px;
+  text-align: center;
+  font-size: 20px;
+  background-color: rgb(237, 237, 237);
+}
 
-/* === hacks / overrides === */
+.legend rect {
+  fill:white;
+  stroke:black;
+  opacity:0.8;
+}
+
+.map {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 50px;
+  right: 200px;
+}
+
+.legends {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 200px;
+  bottom: 200px;
+}
+
+.twitter-button-holder {
+  padding: 10px;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+}
+
+.lineLabel {
+  width: 150px;
+  bottom: -38px;
+  left: -80px;
+}

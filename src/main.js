@@ -383,6 +383,10 @@ skistats.dateFormat = function(format) {
   return skistats;
 };
 
+skistats.selectedSkiStrategy = function() {
+  return selectedSkiStrategy;
+};
+
 skistats.VERSION = '0.0.1';
 
 root.skistats = skistats;

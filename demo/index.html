@@ -2,60 +2,9 @@
 <html>
   <head>
     <title>skistats demo</title>
-    <link rel="stylesheet" href="./assets/normalize.css" />
-    <link rel="stylesheet" href="./assets/main.css" />
-    <style>
-      .timelineContainer {
-        position: absolute;
-        bottom: 40px;
-        left: 0;
-        right: 200px;
-        height: 150px;
-        background-color:rgba(255,255,255,0.6);
-      }
-
-      .x.axis path,.x.axis line {
-          fill: none;
-          stroke: #000;
-          shape-rendering: crispEdges;
-      }
-
-      #dropZone{
-        border: 2px dashed #bbb;
-        -moz-border-radius: 5px;
-        -webkit-border-radius: 5px;
-        border-radius: 5px;
-        padding: 25px;
-        text-align: center;
-        font: 20pt bold 'Vollkorn';
-        color: #bbb;
-        background-color: gray;
-      }
-
-      .legend rect {
-        fill:white;
-        stroke:black;
-        opacity:0.8;
-      }
-
-      .map {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 50px;
-        right: 200px;
-      }
-
-      .legends {
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 200px;
-        bottom: 200px;
-      }
-    </style>
-    
+    <link href='http://fonts.googleapis.com/css?family=Maven+Pro' rel='stylesheet' type='text/css'>  
     <link rel="stylesheet" type="text/css" href="../dist/assets/skistats.css" />
+    <link rel="stylesheet" type="text/css" href="assets/main.css" />
     <script>
       var BASE_STRATEGY_URL = "../dist/strategies/";
     </script>
@@ -63,22 +12,7 @@
     <script type="text/javascript" src="../bower_components/raphael/raphael.js"></script>
     <script type="text/javascript" src="../dist/skistats.js"></script>
     <script type="text/javascript" src="../dist/strategies/livigno-strategy.js"></script>
-  </head>
-  <body>
-    <h1>skistats demo</h1>
     
-    <input type="file" id="files" name="files[]" multiple />
-    <div>or</div>
-    <div id="dropZone">Drop files here</div>
-
-    <!-- begin demo markup -->
-
-    <!-- end demo markup -->
-
-    <p>See the <a href="http://tgeorgiev.github.io/skistats">project homepage</a>.
-    <p>Check out the <a href="https://github.com/tgeorgiev/skistats">project repo</a>.
-    <p>Copyright 2015 Tony Georgiev</p>
-
     <script>
       function handleFileSelect(evt) {
         evt.stopPropagation();
@@ -86,17 +20,23 @@
 
         var files = evt.dataTransfer.files; // FileList object.
         loadFiles(files, function(){
-          document.getElementsByClassName('map')[0].style.display = '';
+          document.getElementsByClassName('visualization')[0].style.display = '';
+          document.getElementsByClassName('filesSelector')[0].style.display = 'none';
 
           skistats.withMap('.map')
             .withLiftLegend('.lifts')
             .withParticipantsLegend('.participants')
             .withTimeline('.timelineContainer');
+          
+          var text = 'I just saw a ski statistics visualization of my ski pass from ' + skistats.selectedSkiStrategy().name + '!';
+          var twitterButtonHTML = "<a class='twitter-share-button' href='https://twitter.com/share' data-related='maverix7' data-url='http://tgeorgiev.github.io/skistats' data-text='" + text + "' data-size='large'>Tweet</a>";
+          
+          document.getElementsByClassName('twitter-button-holder')[0].innerHTML = twitterButtonHTML;
+          twttr.widgets.load();
         });
       }
 
       function loadFiles(files, callback) {
-
         // files is a FileList of File objects. List some properties.
         var filesToLoad = files.length;
         var output = [];
@@ -131,20 +71,54 @@
         evt.preventDefault();
         evt.dataTransfer.dropEffect = 'copy';
       }
-
-      // Setup the dnd listeners.
-      var dropZone = document.getElementById("dropZone");
-      dropZone.addEventListener('dragover', handleDragOver, false);
-      dropZone.addEventListener('drop', handleFileSelect, false);
+      
+      function init() {
+        // Setup the dnd listeners.
+        var dropZone = document.getElementsByClassName('filesSelectorDrop')[0]
+        dropZone.addEventListener('dragover', handleDragOver, false);
+        dropZone.addEventListener('drop', handleFileSelect, false);
+        
+        window.twttr=(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],t=window.twttr||{};if(d.getElementById(id))return;js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);t._e=[];t.ready=function(f){t._e.push(f);};return t;}(document,"script","twitter-wjs"));
+      }
     </script>
+  </head>
+  <body onload="init()">
+    <h1>skistats demo</h1>
     
-    <div class="map" style="display: none">
+    <p>SkiStats visualizes the raw statistics you have from your ski pass. </p>
+    <p>See the <a href="http://tgeorgiev.github.io/skistats">project homepage</a>.
+    <p>Check out the <a href="https://github.com/tgeorgiev/skistats">project repo</a>.
+    
+    <div class="filesSelector">
+      <div class="filesSelectorButton">
+          <button>Select Files</button>
+          <input type="file" id="files" name="files[]" multiple />
+      </div>
+      <p>or</p>
+      <div class="filesSelectorDrop">Drop Files here</div>
     </div>
-    <div class="legends">
-      <div class="lifts"></div>
-      <div class="participants"></div>
+    
+    <div class="visualization" style="display: none">
+      <div class="map">
+      </div>
+      <div class="legends">
+        <div class="lifts"></div>
+        <div class="participants"></div>
+      </div>
+      <div class="timelineContainer">
+      </div>
     </div>
-    <div class="timelineContainer">
-    </div>
+    
+    <a href="https://github.com/tgeorgiev/skistats"><img style="position: absolute; top: 0; right: 0; border: 0;" src="assets/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
   </body>
+  
+  <footer>
+    <div class="twitter-button-holder">
+      <a class="twitter-share-button" href="https://twitter.com/share"
+        data-related="maverix7"
+        data-url="http://tgeorgiev.github.io/skistats"
+        data-text="Visualize your Ski Statistics"
+        data-size="large">Tweet</a>
+    </div>
+  </footer>
 </html>
