@@ -5,15 +5,22 @@
 
 body {
   font-family: 'Maven Pro', sans-serif;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .timelineContainer {
   position: absolute;
   bottom: 40px;
   left: 0;
-  right: 200px;
-  height: 150px;
+  right: 250px;
+  height: 100px;
   background-color:rgba(255,255,255,0.6);
+  border: 1px solid;
+  border-radius: 5px;
 }
 
 .x.axis path,.x.axis line {
@@ -74,15 +81,15 @@ body {
   position: absolute;
   left: 0;
   top: 0;
-  bottom: 50px;
-  right: 200px;
+  bottom: 150px;
+  right: 250px;
 }
 
 .legends {
   position: absolute;
   right: 0;
   top: 0;
-  width: 200px;
+  width: 250px;
   bottom: 200px;
 }
 
@@ -99,4 +106,12 @@ footer {
   width: 150px;
   bottom: -38px;
   left: -80px;
+}
+
+.resortNameHint {
+  font-size: 20px;
+}
+
+.resortName {
+  font-size: 30px;
 }

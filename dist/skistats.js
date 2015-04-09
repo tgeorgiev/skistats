@@ -17,7 +17,7 @@ d3.gantt = function() {
     bottom: 25,
     left: 0,
     width: 1200,
-    height: 150
+    height: 100
   };
   
   var containerD3;
