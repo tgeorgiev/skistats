@@ -27,6 +27,10 @@
   font: 10px sans-serif;
 }
 
+.timelineContainer {
+  cursor: move;
+}
+
 .lineContainer {
   position: absolute;
   left: 0;
@@ -39,25 +43,25 @@
 }
 
 .lineTop {
-    position: absolute;
-    top: -10px;
-    left: -10px;
-  	width: 0; 
-	height: 0; 
-	border-left: 10px solid transparent;
-	border-right: 10px solid transparent;
-	border-top: 10px solid #08c;
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 0; 
+  height: 0; 
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #08c;
 }
   
 .lineBottom {
-    position: absolute;
-    bottom: -10px;
-    left: -10px;
-  	width: 0; 
-	height: 0; 
-	border-left: 10px solid transparent;
-	border-right: 10px solid transparent;
-	border-bottom: 10px solid #08c;
+  position: absolute;
+  bottom: -10px;
+  left: -10px;
+  width: 0; 
+  height: 0; 
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #08c;
 }
 
 .lineLabel {
@@ -79,14 +83,14 @@
 }
   
 .line {
-    background-color: #08c;
-    -webkit-box-shadow: 1px 1px 7px rgba(0,0,0,0.3);
-    -moz-box-shadow: 1px 1px 7px rgba(0,0,0,0.3);
-    box-shadow: 1px 1px 7px rgba(0,0,0,0.3);
-    position: absolute;
-    left: 0;
-    right: 0;
-    width: 1px;
-    top: 0;
-    bottom: 0;
+  background-color: #08c;
+  -webkit-box-shadow: 1px 1px 7px rgba(0,0,0,0.3);
+  -moz-box-shadow: 1px 1px 7px rgba(0,0,0,0.3);
+  box-shadow: 1px 1px 7px rgba(0,0,0,0.3);
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 1px;
+  top: 0;
+  bottom: 0;
 }
