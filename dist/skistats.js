@@ -319,7 +319,13 @@ Map.prototype.updateActors = function() {
 };
 
 function LiftLegend(container) {
-  this.legendObj = d3.select(container).append('form').attr('class', 'liftLegend').append('fieldset');
+  this.legendObj = d3.select(container).append('form').attr('class', 'liftLegend')
+    .on('submit', function() {
+      d3.event.preventDefault();
+      return false;
+    })
+    .append('fieldset');
+  
   this.legendObj.append('legend').html('Lifts');
 
   if (selectedSkiStrategy) {
@@ -339,7 +345,13 @@ LiftLegend.prototype.updateStrategy = function() {
 };
 
 function ParticipantsLegend(container) {
-  this.legendObj = d3.select(container).append('form').attr('class', 'participantsLegend').append('fieldset');
+  this.legendObj = d3.select(container).append('form').attr('class', 'participantsLegend')
+    .on('submit', function() {
+      d3.event.preventDefault();
+      return false;
+    })
+    .append('fieldset');
+  
   this.legendObj.append('legend').html('Participants');
 
   this.updateActors();
