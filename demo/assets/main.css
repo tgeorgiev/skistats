@@ -12,21 +12,43 @@ body {
   right: 0;
 }
 
-.timelineContainer {
+.timeline {
   position: absolute;
   bottom: 40px;
   left: 0;
   right: 250px;
+}
+
+.timelineControls > input{
+  vertical-align: middle;
+  width: auto;
+  display: initial;
+}
+
+.timelineContainer {
+  position: relative;
   height: 100px;
   background-color:rgba(255,255,255,0.6);
   border: 1px solid;
   border-radius: 5px;
+  margin-top: 5px;
 }
 
 .x.axis path,.x.axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
+}
+
+.filesSelector {
+  border: 2px dashed;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  padding: 25px;
+  text-align: center;
+  font-size: 20px;
+  background-color: rgb(237, 237, 237);
 }
 
 .filesSelector p {
@@ -60,17 +82,6 @@ body {
   filter: alpha(opacity=0);
 }
 
-.filesSelectorDrop {
-  border: 2px dashed;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
-  padding: 25px;
-  text-align: center;
-  font-size: 20px;
-  background-color: rgb(237, 237, 237);
-}
-
 .legend rect {
   fill:white;
   stroke:black;
@@ -81,7 +92,7 @@ body {
   position: absolute;
   left: 0;
   top: 0;
-  bottom: 150px;
+  bottom: 170px;
   right: 250px;
 }
 
@@ -94,7 +105,7 @@ body {
 }
 
 .twitter-button-holder {
-  padding: 10px;
+  padding-left: 10px;
 }
 
 footer {

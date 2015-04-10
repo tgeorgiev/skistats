@@ -10,7 +10,9 @@ d3.gantt = function() {
     top: 0,
     right: 0,
     bottom: 25,
-    left: 0,
+    left: 0
+  };
+  var viewport = {
     width: 1200,
     height: 150
   };
@@ -47,19 +49,15 @@ d3.gantt = function() {
 
     var containerDom = containerD3[0][0];
     
-    var totalWidth = margin.width;
-    var totalHeight = margin.height;
-    
-    
-    var width = totalWidth - margin.right - margin.left-5;
-    var height = totalHeight - margin.bottom - margin.top-5;
+    var width = viewport.width - margin.right - margin.left-5;
+    var height = viewport.height - margin.bottom - margin.top-5;
     
     var svg = containerD3
       .append("svg")
       .attr("class", "chart")
       .attr("width", "100%")
       .attr("height", "100%")
-      .attr("viewBox", "0 0 " + totalWidth + " " + totalHeight)
+      .attr("viewBox", "0 0 " + viewport.width + " " + viewport.height)
       .attr("preserveAspectRatio", "xMidYMid")
       .append("g")
       .attr("class", "gantt-chart")
@@ -150,6 +148,13 @@ d3.gantt = function() {
     if (!arguments.length)
       return margin;
     margin = value;
+    return gantt;
+  };
+  
+  gantt.viewport = function(value) {
+    if (!arguments.length)
+      return viewport;
+    viewport = value;
     return gantt;
   };
 

@@ -72,7 +72,7 @@
       }
     };
 
-    var ESTIMATED_LIFT_SPEED = 1.2; // 1.5 seconds per meter
+    var ESTIMATED_LIFT_SPEED = 1.2; // 1.2 seconds per meter
     var parseDate = d3.time.format("%d/%m/%Y %H.%M.%S").parse;
 
     var liftColors = {};
@@ -82,6 +82,7 @@
 
     var livignoStrategy = {
         name: "Livigno",
+        skiPassStatsUrl: "http://www.skipasslivigno.com/?page_id=154",
         recognize: function (textContent) {
             var entries = this.retrieveEntries(textContent);
             return entries && entries.length > 0 && entries[0].resort == "Livigno-SK";
@@ -105,8 +106,10 @@
         liftColors: liftColors,
         liftPaths: liftPaths,
         mapUrl: BASE_STRATEGY_URL + "assets/livigno-map.png",
-        optimalWidth: 1130,
-        optimalHeight: 810
+        viewport: {
+          width: 1130,
+          height: 810
+        }
     };
 
     function calculateEndDate(startDate, liftDistance) {

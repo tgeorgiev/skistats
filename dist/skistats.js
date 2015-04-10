@@ -15,9 +15,11 @@ d3.gantt = function() {
     top: 0,
     right: 0,
     bottom: 25,
-    left: 0,
+    left: 0
+  };
+  var viewport = {
     width: 1200,
-    height: 100
+    height: 150
   };
   
   var containerD3;
@@ -52,19 +54,15 @@ d3.gantt = function() {
 
     var containerDom = containerD3[0][0];
     
-    var totalWidth = margin.width;
-    var totalHeight = margin.height;
-    
-    
-    var width = totalWidth - margin.right - margin.left-5;
-    var height = totalHeight - margin.bottom - margin.top-5;
+    var width = viewport.width - margin.right - margin.left-5;
+    var height = viewport.height - margin.bottom - margin.top-5;
     
     var svg = containerD3
       .append("svg")
       .attr("class", "chart")
       .attr("width", "100%")
       .attr("height", "100%")
-      .attr("viewBox", "0 0 " + totalWidth + " " + totalHeight)
+      .attr("viewBox", "0 0 " + viewport.width + " " + viewport.height)
       .attr("preserveAspectRatio", "xMidYMid")
       .append("g")
       .attr("class", "gantt-chart")
@@ -157,6 +155,13 @@ d3.gantt = function() {
     margin = value;
     return gantt;
   };
+  
+  gantt.viewport = function(value) {
+    if (!arguments.length)
+      return viewport;
+    viewport = value;
+    return gantt;
+  };
 
   gantt.timeDomain = function(value) {
     if (!arguments.length)
@@ -241,7 +246,8 @@ var map;
 var liftLegend;
 var participantsLegend;
 var timeline;
-var vline;
+
+var dispatcher = d3.dispatch("zoom");
 
 function Map(container) {
   this.mapObj = d3.select(container).append('div');
@@ -263,7 +269,7 @@ Map.prototype.updateStrategy = function() {
     .style('background-repeat', 'no-repeat')
     .style('background-position', '50% 0%');
 
-  this.raphaelPaper.setViewBox(0, 0, selectedSkiStrategy.optimalWidth, selectedSkiStrategy.optimalHeight, false);
+  this.raphaelPaper.setViewBox(0, 0, selectedSkiStrategy.viewport.width, selectedSkiStrategy.viewport.height, false);
   this.raphaelPaper.canvas.setAttribute('preserveAspectRatio', 'xMidYMin');
 
   for (var liftName in selectedSkiStrategy.liftPaths) {
@@ -384,13 +390,32 @@ var addParticipantChangeHandlers = function(displayElement, editElement, model) 
   });
 };
 
-function Timeline(container) {
-  this.gantt = d3.gantt()(container);
+function Timeline(container, viewport, margin) {
+  var timelineContainer = d3.select(container).append('div').attr('class', 'timelineContainer');
+  
+  this.gantt = d3.gantt();
+  if (viewport) {
+    this.gantt.viewport(viewport);
+  }
+  
+  if (margin) {
+    this.gantt.margin(margin);
+  }
+  
+  this.gantt(timelineContainer[0][0]);
 
   this.gantt.yTickFormatMapper(function(d) {
     var label = allStatsById[d].displayName;
     return label || d;
   });
+  
+  var lineHolder = this.lineHolder = timelineContainer.append('div').attr('class', 'lineContainer');
+  lineHolder.append('div').attr('class', 'lineTop');
+  lineHolder.append('div').attr('class', 'line');
+  lineHolder.append('div').attr('class', 'lineBottom');
+  this.lineLabel = lineHolder.append('div').attr('class', 'lineLabel');
+
+  this.updatePosition();
 
   if (selectedSkiStrategy) {
     this.refresh();
@@ -432,6 +457,8 @@ Timeline.prototype.refresh = function() {
 
     index++;
   }
+  
+  this.tasks = tasks;
 
   this.gantt.taskTypes(taskNames);
   this.gantt.taskStatusColor(selectedSkiStrategy.liftColors);
@@ -442,18 +469,21 @@ Timeline.prototype.refresh = function() {
   this.gantt.timeDomain([rangeMin, rangeMax]);
 
   var thisGantt = this.gantt;
+  var that = this;
 
-  var zoom = d3.behavior.zoom()
+  this.zoom = d3.behavior.zoom()
     .x(thisGantt.getX())
     .scaleExtent([1, 200])
     .on("zoom", function() {
       thisGantt.redraw(tasks);
 
-      vline.updatePosition();
+      that.updatePosition();
+    
+      dispatcher.zoom(that.zoom.scale());
     });
 
-  zoom.scale(1.5);
-  zoom(thisGantt.getChart());
+  this.zoom.scale(1.5);
+  this.zoom(thisGantt.getChart());
   this.gantt.redraw(tasks, true);
 };
 
@@ -461,35 +491,48 @@ Timeline.prototype.updateYTickFormat = function() {
   this.gantt.updateYAxis();
 };
 
-function Vline(container) {
-  var lineHolder = this.lineHolder = d3.select(container).append('div').attr('class', 'lineContainer');
-  lineHolder.append('div').attr('class', 'lineTop');
-  lineHolder.append('div').attr('class', 'line');
-  lineHolder.append('div').attr('class', 'lineBottom');
-  this.lineLabel = lineHolder.append('div').attr('class', 'lineLabel');
+Timeline.prototype.updatePosition = function() {
+  var leftMargin = this.gantt.margin().left;
 
-  this.updatePosition();
-}
-
-Vline.prototype.updatePosition = function() {
-  var gantt = timeline.gantt;
-
-  var leftMargin = gantt.margin().left;
-
-  var percentage = gantt.margin().width / gantt.getChart()[0][0].offsetWidth;
+  var percentage = this.gantt.viewport().width / this.gantt.getChart()[0][0].offsetWidth;
 
   var actualX = this.lineHolder[0][0].offsetLeft * percentage - leftMargin;
 
-  var currentDate = gantt.getX().invert(actualX);
-  this.updateLabel(currentDate);
+  var currentDate = this.gantt.getX().invert(actualX);
+  var fomattedDate = dateFormatInstance(currentDate);
+  this.lineLabel.html(fomattedDate);
   if (map) {
     map.updatePosition(currentDate);
   }
 };
 
-Vline.prototype.updateLabel = function(date) {
-  var fomattedDate = dateFormatInstance(date);
-  this.lineLabel.html(fomattedDate);
+Timeline.prototype.zoomCentered = function(scale) {
+  var currentTranslate = this.zoom.translate()[0];
+  var currentScale = this.zoom.scale();
+  
+  var scaledNewCenter = this.gantt.viewport().width * (scale / currentScale);
+  var diff = (scaledNewCenter - this.gantt.viewport().width) / 2;
+  
+  var scaledTranslate = currentTranslate * (scale / currentScale);
+  
+  var newTranslate = scaledTranslate - diff;
+  
+  this.zoom.translate([newTranslate, 0]);
+  this.zoom.scale(scale);
+  
+  dispatcher.zoom(this.zoom.scale());
+  
+  this.gantt.redraw(this.tasks);
+};
+
+Timeline.prototype.zoomIntervalMs = function(intervalMilliseconds) {
+  var currentScale = this.zoom.scale();
+  var currentBeginDate = this.gantt.getX().invert(0);
+  var currentEndDate = this.gantt.getX().invert(this.gantt.viewport().width);
+  
+  var percentage = (currentEndDate - currentBeginDate) / intervalMilliseconds;
+  
+  this.zoomCentered(currentScale * percentage);
 };
 
 var updateStrategy = function(strategy) {
@@ -569,38 +612,64 @@ skistats.addStrategy = function(strategy) {
   strategies.push(strategy);
 };
 
-skistats.withMap = function(container) {
+skistats.map = function(container) {
   if (map) {
     throw new Error("Only single instance of the map is supported");
   }
   map = new Map(container);
-  return skistats;
 };
 
-skistats.withLiftLegend = function(container) {
+skistats.liftLegend = function(container) {
   if (liftLegend) {
     throw new Error("Only single instance of the lift legend is supported");
   }
   liftLegend = new LiftLegend(container);
-  return skistats;
 };
 
-skistats.withParticipantsLegend = function(container) {
+skistats.participantsLegend = function(container) {
   if (participantsLegend) {
     throw new Error("Only single instance of the participants legend is supported");
   }
   participantsLegend = new ParticipantsLegend(container);
-  return skistats;
 };
 
-skistats.withTimeline = function(container) {
+var timelineContext = {};
+
+timelineContext.getZoomScaleExtent = function() {
+  return timeline.zoom.scaleExtent();
+};
+
+timelineContext.getZoomContext = function() {
+  if (timeline) {
+    return {
+      scale: timeline.zoom.scale()
+    };
+  }
+};
+
+timelineContext.zoomCentered = function(scale) {
+  if (timeline) {
+    timeline.zoomCentered(scale);
+  }
+};
+
+timelineContext.zoomIntervalMs = function(intervalMilliseconds) {
+  if (timeline) {
+    timeline.zoomIntervalMs(intervalMilliseconds);
+  }
+};
+
+timelineContext.onZoom = function(listener) {
+  dispatcher.on('zoom', listener);
+};
+
+skistats.timeline = function(container, viewport, margin) {
   if (timeline) {
     throw new Error("Only single instance of the timeline is supported");
   }
-  timeline = new Timeline(container);
-  vline = new Vline(container);
+  timeline = new Timeline(container, viewport, margin);
 
-  return skistats;
+  return timelineContext;
 };
 
 skistats.dateFormat = function(format) {

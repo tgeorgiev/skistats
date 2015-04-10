@@ -69,8 +69,7 @@
   width: 100px;
   bottom: -30px;
   left: -55px;
-  background:#08c; /* default background for browsers without gradient support */
-  /* css3 */
+  background:#08c;
   background:-webkit-gradient(linear, 0 0, 0 100%, from(#08c), to(#47A9DA));
   background:-moz-linear-gradient(#08c, #47A9DA);
   background:-o-linear-gradient(#08c, #47A9DA);

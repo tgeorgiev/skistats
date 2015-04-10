@@ -3,10 +3,15 @@
   <head>
     <title>skistats demo</title>
     <link href='http://fonts.googleapis.com/css?family=Maven+Pro' rel='stylesheet' type='text/css'>  
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../dist/assets/skistats.css" />
     <link rel="stylesheet" type="text/css" href="assets/main.css" />
     <script>
       var BASE_STRATEGY_URL = "../dist/strategies/";
+      var HALF_DAY_MS = 43200000;
+      var ONE_DAY_MS = 86400000;
+      var THREE_DAYS_MS = 259200000;
+      var WEEK_MS = 604800000;
     </script>
     <script type="text/javascript" src="../bower_components/d3/d3.min.js"></script>
     <script type="text/javascript" src="../bower_components/raphael/raphael.js"></script>
@@ -14,26 +19,53 @@
     <script type="text/javascript" src="../dist/strategies/livigno-strategy.js"></script>
     
     <script>
-      function handleFileSelect(evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
+      
+      var timeline;
+      
+      function handleFileSelect() {
+        d3.event.stopPropagation();
+        d3.event.preventDefault();
 
-        var files = evt.dataTransfer.files; // FileList object.
+        var files = d3.event.target.files || d3.event.dataTransfer.files; // FileList object.
         loadFiles(files, function(){
-          document.getElementsByClassName('visualization')[0].style.display = '';
-          document.getElementsByClassName('filesSelector')[0].style.display = 'none';
+          d3.select('.visualization').style('display', '');
+          d3.select('.intro').style('display', 'none');
 
-          skistats.withMap('.map')
-            .withLiftLegend('.lifts')
-            .withParticipantsLegend('.participants')
-            .withTimeline('.timelineContainer');
+          var margin = {
+            top: 0,
+            right: 0,
+            bottom: 25,
+            left: 0
+          };
+          var viewport = {
+            width: 1200,
+            height: 100
+          };
+
+          skistats.map('.map');
+          skistats.liftLegend('.lifts');
+          skistats.participantsLegend('.participants');
+          timeline = skistats.timeline('.timeline', viewport, margin);
           
-          document.getElementsByClassName('resortName')[0].innerHTML = skistats.selectedSkiStrategy().name;
+          var zoomScaleExtent = timeline.getZoomScaleExtent();
+          var zoomContext = timeline.getZoomContext();
+          
+          timeline.onZoom(function() {
+            var zoomContext = timeline.getZoomContext();
+            d3.select('#zoomSlider')[0][0].value=zoomContext.scale;
+          });
+          
+          d3.select('#zoomSlider').attr("value", zoomContext.scale)
+            .attr("min", zoomScaleExtent[0])
+            .attr("max", zoomScaleExtent[1])
+            .attr("step", (zoomScaleExtent[1] - zoomScaleExtent[0]) / 100);
+          
+          d3.select('.resortName').html(skistats.selectedSkiStrategy().name);
           
           var text = 'I just saw a ski statistics visualization of my ski pass from ' + skistats.selectedSkiStrategy().name + '!';
           var twitterButtonHTML = "<a class='twitter-share-button' href='https://twitter.com/share' data-related='maverix7' data-url='http://tgeorgiev.github.io/skistats' data-text='" + text + "' data-size='large'>Tweet</a>";
           
-          document.getElementsByClassName('twitter-button-holder')[0].innerHTML = twitterButtonHTML;
+          d3.select('.twitter-button-holder').html(twitterButtonHTML);
           twttr.widgets.load();
         });
       }
@@ -68,36 +100,82 @@
         }
       }
 
-      function handleDragOver(evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
-        evt.dataTransfer.dropEffect = 'copy';
+      function handleDragOver() {
+        d3.event.dataTransfer.dropEffect = 'copy';
+      }
+      
+      function handleDragEnter() {
+        d3.select('.filesSelector').style('background-color', 'rgb(210, 233, 255)');
+      }
+      
+      function handleDragLeave() {
+        d3.select('.filesSelector').style('background-color', '');
       }
       
       function init() {
         // Setup the dnd listeners.
-        var dropZone = document.getElementsByClassName('filesSelectorDrop')[0]
-        dropZone.addEventListener('dragover', handleDragOver, false);
-        dropZone.addEventListener('drop', handleFileSelect, false);
         
+        var preventDefaultDrag = function () {
+          d3.event.preventDefault();
+        };
+        
+        d3.select(document).on('dragover', preventDefaultDrag).on('drop', preventDefaultDrag);
+        
+        var dropZone = d3.select('.filesSelector');
+        dropZone.on('dragover', handleDragEnter);
+        dropZone.on('dragenter', handleDragOver);
+        dropZone.on('dragleave', handleDragLeave);
+        dropZone.on('drop', handleFileSelect);
+        
+        d3.select('#filesSelectorInput').on('change', handleFileSelect);
+        
+        // Setup the zoom option listeners.
+        d3.select('#zoomHalfDay').on('click', function() {
+          timeline.zoomIntervalMs(HALF_DAY_MS);
+        });
+        
+        d3.select('#zoomDay').on('click', function() {
+          timeline.zoomIntervalMs(ONE_DAY_MS);
+        });
+        
+        d3.select('#zoom3Days').on('click', function() {
+          timeline.zoomIntervalMs(THREE_DAYS_MS);
+        });
+        
+        d3.select('#zoomWeek').on('click', function() {
+          timeline.zoomIntervalMs(WEEK_MS);
+        });
+        
+        d3.select('#zoomSlider').on('input', function() {
+          timeline.zoomCentered(d3.select(this).property("value"));
+        });
+        
+        // Setup the twitter button.
         window.twttr=(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],t=window.twttr||{};if(d.getElementById(id))return;js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);t._e=[];t.ready=function(f){t._e.push(f);};return t;}(document,"script","twitter-wjs"));
       }
     </script>
   </head>
-  <body onload="init()">
-    <h1>skistats demo</h1>
+  <body onload="init()">    
+    <div class="intro">
+      <h1>skistats demo</h1>
     
-    <p>SkiStats visualizes the raw statistics you have from your ski pass. </p>
-    <p>See the <a href="http://tgeorgiev.github.io/skistats">project homepage</a>.
-    <p>Check out the <a href="https://github.com/tgeorgiev/skistats">project repo</a>.
-    
-    <div class="filesSelector">
-      <div class="filesSelectorButton">
-          <button>Select Files</button>
-          <input type="file" id="files" name="files[]" multiple />
+      <p>SkiStats visualizes the raw statistics you have from your ski pass. </p>
+      <p>See the <a href="http://tgeorgiev.github.io/skistats">project homepage</a>.
+      <p>Check out the <a href="https://github.com/tgeorgiev/skistats">project repo</a>.
+      
+      <div class="filesSelector">
+        <p>To see visualization of your ski pass, add the file(s) containing the stats from your ski pass. See which Ski resorts are supported <a href="">here</a></p>
+        <div class="filesSelectorButton">
+            <button class="btn btn-primary">Select files</button>
+            <input type="file" id="filesSelectorInput" name="files[]" multiple />
+        </div>
+        <p>or</p>
+        <div>Drop files inside</div>
       </div>
       <p>or</p>
-      <div class="filesSelectorDrop">Drop Files here</div>
+      <div class="loadDemoStats">
+         <button class="btn btn-info">Load with demo stats from Livigno</button>
+      </div>
       
       <a href="https://github.com/tgeorgiev/skistats"><img style="position: absolute; top: 0; right: 0; border: 0;" src="assets/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
     </div>
@@ -107,12 +185,19 @@
       </div>
       <div class="legends">
         <div>
-          <span class="resortNameHint">Stats for </span><span class="resortName"></span>
+          <span class="resortName"></span><span class="resortNameHint"> stats</span>
         </div>
         <div class="lifts"></div>
         <div class="participants"></div>
       </div>
-      <div class="timelineContainer">
+      <div class="timeline">
+        <div class="timelineControls">
+          <button id="zoomHalfDay" class="btn btn-default">Half Day</button>
+          <button id="zoomDay" class="btn btn-default ">Day</button>
+          <button id="zoom3Days" class="btn btn-default">3 Days</button>
+          <button id="zoomWeek" class="btn btn-default">Week</button>
+          <input id="zoomSlider" type="range">
+        </div>
       </div>
     </div>
     
