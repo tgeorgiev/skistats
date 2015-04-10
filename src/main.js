@@ -193,11 +193,11 @@ function Timeline(container, viewport, margin) {
   lineHolder.append('div').attr('class', 'lineBottom');
   this.lineLabel = lineHolder.append('div').attr('class', 'lineLabel');
 
-  this.updatePosition();
-
   if (selectedSkiStrategy) {
     this.refresh();
   }
+  
+  this.updatePosition();
 }
 
 Timeline.prototype.refresh = function() {
