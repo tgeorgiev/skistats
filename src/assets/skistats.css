@@ -12,17 +12,17 @@
 .liftLegend .liftLabel {
 }
 
-.participantsLegend {
+.passLegend {
 }
 
-.participantsLegend .participantColor {
+.passLegend .passColor {
   margin-right: 15px;
   border: 4px solid;
   border-radius: 50%;
   float: left;
 }
 
-.participantsLegend .participantName, .participantsLegend .participantNameEdit {
+.passLegend .passName, .passLegend .passNameEdit {
 }
 
 .timelineContainer {

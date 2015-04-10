@@ -236,6 +236,7 @@ d3.gantt = function() {
 
 var dateFormat = "%d/%m/%Y %H:%M";
 var dateFormatInstance = d3.time.format(dateFormat);
+var passColors = d3.scale.category10();
 
 var allStatsById = {};
 
@@ -244,14 +245,17 @@ var selectedSkiStrategy;
 
 var map;
 var liftLegend;
-var participantsLegend;
+var passLegend;
 var timeline;
 
 var dispatcher = d3.dispatch("zoom");
 
+var CIRCLE_HEIGHT = 10;
+
+
 function Map(container) {
   this.mapObj = d3.select(container).append('div');
-  this.mapActors = {};
+  this.mapPasses = {};
   this.raphaelLifts = {};
   this.raphaelPaper = new Raphael(this.mapObj[0][0], '100%', '100%');
 
@@ -259,7 +263,7 @@ function Map(container) {
     this.updateStrategy();
   }
 
-  this.updateActors();
+  this.updatePasses();
 }
 
 Map.prototype.updateStrategy = function() {
@@ -284,10 +288,11 @@ Map.prototype.updateStrategy = function() {
 };
 
 Map.prototype.updatePosition = function(date) {
-//  var prevCircles = [];
-  for (var actorId in allStatsById) {
-    var circle = this.mapActors[actorId];
-    var entry = getLiftEntry(actorId, date);
+  var circlesWithPositions = [];
+  
+  for (var passId in allStatsById) {
+    var circle = this.mapPasses[passId];
+    var entry = getLiftEntry(passId, date);
     if (!entry) {
       circle.hide();
     } else {
@@ -299,22 +304,44 @@ Map.prototype.updatePosition = function(date) {
 
       var len = path.getTotalLength();
       var point = path.getPointAtLength(position * len);
-
-      //        prevCircles.forEach(function(prevCircle, i) {
-      //          circle.transform.
-      //          if (point.x
-      //        });
-
-      circle.transform("t" + [point.x, point.y]);
+      
+      circlesWithPositions.push({circle: circle, point: point});
     }
+  }
+  
+  circlesWithPositions.sort(function(a, b){return a.point.x-b.point.x;});
+  
+  for (var i = 0; i < circlesWithPositions.length; i++) {
+    var cwp = circlesWithPositions[i];
+    applyOverlappingWithPrevious(cwp, circlesWithPositions, i-1);
   }
 };
 
-Map.prototype.updateActors = function() {
-  for (var actorId in allStatsById) {
-    var circle = this.raphaelPaper.circle(0, 0, 10).attr("fill", "red");
+// TODO improve calculation
+function applyOverlappingWithPrevious(currentCWP, circlesWithPositions, prevPosition) {
+  var r = CIRCLE_HEIGHT / 2;
+  if (prevPosition > 0) {
+    var lastCWP;
+    for (var i = 0; i <= prevPosition; i++) {
+      lastCWP = circlesWithPositions[i];
+      if (Math.abs(currentCWP.point.x - lastCWP.point.x) < r && Math.abs(currentCWP.point.y - lastCWP.point.y) < r) {
+        currentCWP.point.x = lastCWP.point.x + r;
+        currentCWP.point.y = lastCWP.point.y + r;
+        currentCWP.circle.insertAfter(lastCWP.circle);
+      }
+    } 
+  }
+  
+  currentCWP.circle.transform("t" + [currentCWP.point.x, currentCWP.point.y]);
+}
+
+Map.prototype.updatePasses = function() {
+  var passIndex = 0;
+  for (var passId in allStatsById) {
+    var circle = this.raphaelPaper.circle(0, 0, CIRCLE_HEIGHT).attr("fill", passColors(passIndex));
     circle.hide();
-    this.mapActors[actorId] = circle;
+    this.mapPasses[passId] = circle;
+    passIndex++;
   }
 };
 
@@ -344,36 +371,38 @@ LiftLegend.prototype.updateStrategy = function() {
   }
 };
 
-function ParticipantsLegend(container) {
-  this.legendObj = d3.select(container).append('form').attr('class', 'participantsLegend')
+function PassLegend(container) {
+  this.legendObj = d3.select(container).append('form').attr('class', 'passLegend')
     .on('submit', function() {
       d3.event.preventDefault();
       return false;
     })
     .append('fieldset');
   
-  this.legendObj.append('legend').html('Participants');
-
-  this.updateActors();
+  this.updatePasses();
 }
 
-ParticipantsLegend.prototype.updateActors = function() {
+PassLegend.prototype.updatePasses = function() {
   this.legendObj.html('');
-  this.legendObj.append('legend').html('Participants');
-  for (var actorId in allStatsById) {
-    var stat = allStatsById[actorId];
-    var participantName = stat.displayName;
+  this.legendObj.append('legend').html('Passes');
+  
+  var passIndex = 0;
+  for (var passId in allStatsById) {
+    var stat = allStatsById[passId];
+    var passName = stat.displayName;
 
     var legendElement = this.legendObj.append('div');
-    legendElement.append('div').attr('class', 'participantColor').style('border-color', 'green');
-    var participantElement = legendElement.append('span').attr('class', 'participantName').html(participantName);
-    var participantEditElement = legendElement.append('input').attr('class', 'participantNameEdit').style('display', 'none');
+    legendElement.append('div').attr('class', 'passColor').style('border-color', passColors(passIndex));
+    var passElement = legendElement.append('span').attr('class', 'passName').html(passName);
+    var passEditElement = legendElement.append('input').attr('class', 'passNameEdit').style('display', 'none');
 
-    addParticipantChangeHandlers(participantElement, participantEditElement, stat);
+    addPassChangeHandlers(passElement, passEditElement, stat);
+    
+    passIndex++;
   }
 };
 
-var addParticipantChangeHandlers = function(displayElement, editElement, model) {
+var addPassChangeHandlers = function(displayElement, editElement, model) {
   displayElement.on("click", function() {
     var displayElementWidth = displayElement[0][0].offsetWidth;
     displayElement.style('display', 'none');
@@ -558,8 +587,8 @@ var updateStrategy = function(strategy) {
   }
 };
 
-var getLiftEntry = function(actorId, dateBetween) {
-  var fileData = allStatsById[actorId];
+var getLiftEntry = function(passId, dateBetween) {
+  var fileData = allStatsById[passId];
   for (var i = 0; i < fileData.entries.length; i++) {
     var entry = fileData.entries[i];
     if (entry.startDate < dateBetween && dateBetween < entry.endDate) {
@@ -612,11 +641,11 @@ skistats.addStat = function(id, textContents) {
   };
 
   if (map) {
-    map.updateActors();
+    map.updatePasses();
   }
 
-  if (participantsLegend) {
-    participantsLegend.updateActors();
+  if (passLegend) {
+    passLegend.updatePasses();
   }
 };
 
@@ -638,11 +667,11 @@ skistats.liftLegend = function(container) {
   liftLegend = new LiftLegend(container);
 };
 
-skistats.participantsLegend = function(container) {
-  if (participantsLegend) {
-    throw new Error("Only single instance of the participants legend is supported");
+skistats.passLegend = function(container) {
+  if (passLegend) {
+    throw new Error("Only single instance of the pass legend is supported");
   }
-  participantsLegend = new ParticipantsLegend(container);
+  passLegend = new PassLegend(container);
 };
 
 var timelineContext = {};
