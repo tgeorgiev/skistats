@@ -83,11 +83,11 @@
     var livignoStrategy = {
         name: "Livigno",
         skiPassStatsUrl: "http://www.skipasslivigno.com/?page_id=154",
-        recognize: function (textContent) {
-            var entries = this.retrieveEntries(textContent);
+        recognizeCSV: function (textContent) {
+            var entries = this.retrieveEntriesCSV(textContent);
             return entries && entries.length > 0 && entries[0].resort == "Livigno-SK";
         },
-        retrieveEntries: function (textContent) {
+        retrieveEntriesCSV: function (textContent) {
             return d3.csv.parse(textContent, function(d) {
                 var startDate = parseDate(d.date);
                 var liftDistance = parseFloat(d.disl);
@@ -102,6 +102,13 @@
                     resort: d.pobz
                 };
             });
+        },
+        recognizeJSON: function (json) {
+            return json && json.length > 0 && json[0].resort == "Livigno-SK";
+        },
+        retrieveEntriesJSON: function (json) {
+          // no additional transformations required
+          return json;
         },
         liftColors: liftColors,
         liftPaths: liftPaths,

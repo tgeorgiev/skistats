@@ -17,6 +17,8 @@ var timeline;
 var dispatcher = d3.dispatch("zoom");
 
 var CIRCLE_HEIGHT = 10;
+var CSV_STAT_MODE = "CSV_STAT_MODE";
+var JSON_STAT_MODE = "JSON_STAT_MODE";
 
 
 function Map(container) {
@@ -365,9 +367,17 @@ var getLiftEntry = function(passId, dateBetween) {
   return null;
 };
 
-var getStrategy = function(textContents) {
+var recognizeStrategy = function(strategy, content, mode) {
+  if (mode == CSV_STAT_MODE) {
+    return strategy.recognizeCSV(content);
+  } else {
+    return strategy.recognizeJSON(content);
+  }
+};
+
+var getStrategy = function(content, mode) {
   if (selectedSkiStrategy) {
-    if (!selectedSkiStrategy.recognize(textContents)) {
+    if (!recognizeStrategy(selectedSkiStrategy, content, mode)) {
       throw new Error("There was already a selected strategy [ " + selectedSkiStrategy.name + "] but it does not recognize new contents. Make sure the files follow the same format.");
     }
 
@@ -377,7 +387,7 @@ var getStrategy = function(textContents) {
   var applicableStrategies = [];
   for (var i = 0; i < strategies.length; i++) {
     var strategy = strategies[i];
-    if (strategy.recognize(textContents)) {
+    if (recognizeStrategy(strategy, content, mode)) {
       applicableStrategies.push(strategy);
     }
   }
@@ -388,18 +398,23 @@ var getStrategy = function(textContents) {
     throw new Error(applicableStrategies.length + " applicable strategies were found, only one was expected. " + applicableStrategies);
   }
 
-  selectedSkiStrategy = applicableStrategies[0];
-
-  return selectedSkiStrategy;
+  return applicableStrategies[0];
 };
 
 var skistats = {};
 
-skistats.addStat = function(id, textContents) {
+var addStat = function(id, content, mode) {
   if (!selectedSkiStrategy) {
-    updateStrategy(getStrategy(textContents));
+    updateStrategy(getStrategy(content, mode));
   }
-  var entries = selectedSkiStrategy.retrieveEntries(textContents);
+  var entries;
+  if (mode === CSV_STAT_MODE) {
+    entries = selectedSkiStrategy.retrieveEntriesCSV(content);
+  } else {
+    entries = selectedSkiStrategy.retrieveEntriesJSON(content);
+  }
+  
+  console.log(JSON.stringify(entries));
 
   allStatsById[id] = {
     displayName: id,
@@ -413,6 +428,14 @@ skistats.addStat = function(id, textContents) {
   if (passLegend) {
     passLegend.updatePasses();
   }
+};
+
+skistats.addCSV = function(id, textContents) {
+  addStat(id, textContents, CSV_STAT_MODE);
+};
+
+skistats.addJSON = function(id, json) {
+  addStat(id, json, JSON_STAT_MODE);
 };
 
 skistats.addStrategy = function(strategy) {
