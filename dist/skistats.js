@@ -289,7 +289,7 @@ Map.prototype.updateStrategy = function() {
   }
 };
 
-Map.prototype.updatePosition = function(date) {
+Map.prototype.updatePosition = function(date) {  
   var circlesWithPositions = [];
   
   for (var passId in allStatsById) {
@@ -300,42 +300,103 @@ Map.prototype.updatePosition = function(date) {
     } else {
       circle.show();
       var position = (date - entry.startDate) / (entry.endDate - entry.startDate);
-
-      console.log("position " + position);
       var path = this.raphaelLifts[entry.lift];
 
       var len = path.getTotalLength();
       var point = path.getPointAtLength(position * len);
       
-      circlesWithPositions.push({circle: circle, point: point});
+      var centerPoint, nextPoint;
+      if (position + 0.01 > 1) {
+        centerPoint = path.getPointAtLength((position - 0.01) * len);
+        nextPoint = point;
+      } else {
+        centerPoint = point;
+        nextPoint = path.getPointAtLength((position + 0.01) * len);
+      }
+      
+      var angle = Raphael.angle(centerPoint.x, centerPoint.y, nextPoint.x, nextPoint.y);
+      circlesWithPositions.push({circle: circle, point: point, angle: angle});
     }
   }
   
-  circlesWithPositions.sort(function(a, b){return a.point.x-b.point.x;});
-  
-  for (var i = 0; i < circlesWithPositions.length; i++) {
-    var cwp = circlesWithPositions[i];
-    applyOverlappingWithPrevious(cwp, circlesWithPositions, i-1);
-  }
+  var overlappingInfo = calculateOverlappingInfo(circlesWithPositions);
+  applyTransformationWithOverlapping(overlappingInfo);
 };
 
-// TODO improve calculation
-function applyOverlappingWithPrevious(currentCWP, circlesWithPositions, prevPosition) {
-  var r = CIRCLE_HEIGHT / 2;
-  if (prevPosition > 0) {
-    var lastCWP;
-    for (var i = 0; i <= prevPosition; i++) {
-      lastCWP = circlesWithPositions[i];
-      if (Math.abs(currentCWP.point.x - lastCWP.point.x) < r && Math.abs(currentCWP.point.y - lastCWP.point.y) < r) {
-        currentCWP.point.x = lastCWP.point.x + r;
-        currentCWP.point.y = lastCWP.point.y + r;
-        currentCWP.circle.insertAfter(lastCWP.circle);
+var calculateOverlappingInfo = function(circlesWithPositions) {
+  var defaultRadius = CIRCLE_HEIGHT / 2;
+  var overlappingInfo = [];
+  
+  circlesWithPositions.sort(function(a, b){return lineDistance(a.point, b.point) - defaultRadius;});
+  
+  for (var ci = 0; ci < circlesWithPositions.length; ci++) {
+    var cwp = circlesWithPositions[ci];
+    var overlapping = false;
+
+    for (var i = 0; i < overlappingInfo.length; i++) {
+      var oi = overlappingInfo[i];
+
+      if (!overlapping && Math.pow(cwp.point.x - oi.area.center.x, 2) + Math.pow(cwp.point.y - oi.area.center.y, 2) < Math.pow(oi.area.radius, 2)) {
+        var d = lineDistance(cwp.point, oi.area.center);
+        oi.area.radius = Math.max(oi.area.radius, d + defaultRadius);
+        oi.cwps.push(cwp);
+        overlapping = true;
       }
-    } 
+    }
+
+    if (!overlapping) {
+      overlappingInfo.push({
+        area: {
+          center: cwp.point,
+          radius: defaultRadius
+        },
+        cwps: [cwp]
+      });
+    }
   }
   
-  currentCWP.circle.transform("t" + [currentCWP.point.x, currentCWP.point.y]);
-}
+  return overlappingInfo;
+};
+
+var applyTransformationWithOverlapping = function(overlappingInfo) {
+  var defaultRadius = CIRCLE_HEIGHT / 2;
+  
+  for (var i = 0; i < overlappingInfo.length; i++) {
+   var cwps = overlappingInfo[i].cwps;
+   var cwpsIndexCenter = (cwps.length - 1) / 2;
+   
+   var prevCwp;
+   
+   for (var j = 0; j < cwps.length; j++) {
+     var cwp = cwps[j];
+     
+     var point = cwp.point;
+     
+     var perpendicularAngle = cwp.angle;
+     if (j - cwpsIndexCenter < 0) {
+       perpendicularAngle = cwp.angle - 90;
+     } else if (j - cwpsIndexCenter > 0) {
+       perpendicularAngle = cwp.angle + 90;
+     }
+     var rads = perpendicularAngle * (Math.PI / 180);
+     var length = Math.abs(defaultRadius * (j - cwpsIndexCenter));
+     
+     point.x += length * Math.cos(rads);
+     point.y += length * Math.sin(rads);
+     cwp.circle.transform("t" + [point.x, point.y]);
+     
+     if (prevCwp) {
+        cwp.circle.insertAfter(prevCwp.circle);
+     }
+     
+     prevCwp = cwp;
+   }
+ }
+};
+
+var lineDistance = function(point1, point2){ 
+  return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+};
 
 Map.prototype.updatePasses = function() {
   var passIndex = 0;
@@ -647,8 +708,6 @@ var addStat = function(id, content, mode) {
   } else {
     entries = selectedSkiStrategy.retrieveEntriesJSON(content);
   }
-  
-  console.log(JSON.stringify(entries));
 
   allStatsById[id] = {
     displayName: id,
