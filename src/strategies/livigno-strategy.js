@@ -83,8 +83,23 @@
       },
       'L Sc.San Rocco': {
         path: '<path class="line" d="M558,445L558,445L625,440L625,440"></path>',
-        color: 'wheat',
+        color: 'sienna',
         displayName: 'L Sc.San Rocco'
+      },
+      'L A. Telec. Tagliede': {
+        path: '<path class="line" d="M658,641L658,641L729,622L729,622L766,605L766,605"></path>',
+        color: 'chocolate',
+        displayName: 'L A. Telec. Tagliede'
+      },
+      'L A. Telec. Costaccia': {
+        path: '<path class="line" d="M764,607L764,607L800,590L800,590L824,567L824,567L878,528L878,528"></path>',
+        color: 'lightcoral',
+        displayName: 'L A. Telec. Costaccia'
+      },
+      'L Sg.Valandrea Vetta': {
+        path: '<path class="line" d="M881,533L881,533L936,497L936,497L983,458L983,458L1044,416L1044,416"></path>',
+        color: 'wheat',
+        displayName: 'L Sg.Valandrea Vetta'
       }
     };
 
