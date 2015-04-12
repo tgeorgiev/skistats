@@ -495,7 +495,7 @@ var addPassChangeHandlers = function(displayElement, editElement, model) {
 };
 
 function Timeline(container, viewport, margin) {
-  var timelineContainer = d3.select(container).append('div').attr('class', 'timelineContainer');
+  var timelineContainer = this.timelineContainer = d3.select(container).append('div').attr('class', 'timelineContainer');
   
   this.gantt = d3.gantt();
   if (viewport) {
@@ -598,7 +598,7 @@ Timeline.prototype.updateYTickFormat = function() {
 Timeline.prototype.updatePosition = function() {
   var leftMargin = this.gantt.margin().left;
 
-  var percentage = this.gantt.viewport().width / this.gantt.getChart()[0][0].offsetWidth;
+  var percentage = this.gantt.viewport().width / this.timelineContainer[0][0].offsetWidth;
 
   var actualX = this.lineHolder[0][0].offsetLeft * percentage - leftMargin;
 
