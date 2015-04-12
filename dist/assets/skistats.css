@@ -48,7 +48,7 @@
   height: 0; 
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-top: 10px solid #08c;
+  border-top: 10px solid #3FAFFF;
 }
   
 .lineBottom {
@@ -59,28 +59,27 @@
   height: 0; 
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-bottom: 10px solid #08c;
+  border-bottom: 10px solid #3FAFFF;
 }
 
 .lineLabel {
   position:absolute;
   padding:5px;
-  color:#000;
   width: 100px;
   bottom: -30px;
   left: -55px;
-  background:#08c;
-  background:-webkit-gradient(linear, 0 0, 0 100%, from(#08c), to(#47A9DA));
-  background:-moz-linear-gradient(#08c, #47A9DA);
-  background:-o-linear-gradient(#08c, #47A9DA);
-  background:linear-gradient(#08c, #47A9DA);
+  background:#3FAFFF;
+  background:-webkit-gradient(linear, 0 0, 0 100%, from(#3FAFFF), to(#72C4FF));
+  background:-moz-linear-gradient(#3FAFFF, #72C4FF);
+  background:-o-linear-gradient(#3FAFFF, #72C4FF);
+  background:linear-gradient(#3FAFFF, #72C4FF);
   -webkit-border-radius:2px;
   -moz-border-radius:2px;
   border-radius:2px;
 }
   
 .line {
-  background-color: #08c;
+  background-color: #3FAFFF;
   -webkit-box-shadow: 1px 1px 7px rgba(0,0,0,0.3);
   -moz-box-shadow: 1px 1px 7px rgba(0,0,0,0.3);
   box-shadow: 1px 1px 7px rgba(0,0,0,0.3);
@@ -90,4 +89,14 @@
   width: 1px;
   top: 0;
   bottom: 0;
+}
+
+.mapTooltip {
+  position: absolute;
+  padding:2px;
+  background-color: rgba(63, 175, 255, 0.8);
+  -webkit-border-radius:2px;
+  -moz-border-radius:2px;
+  border-radius:2px;
+  pointer-events: none;
 }

@@ -251,15 +251,21 @@ var timeline;
 var dispatcher = d3.dispatch("zoom");
 
 var CIRCLE_HEIGHT = 10;
+var CIRCLE_RADIUS = CIRCLE_HEIGHT / 2;
+var TOOLTIP_PADDING = 4;
+
 var CSV_STAT_MODE = "CSV_STAT_MODE";
 var JSON_STAT_MODE = "JSON_STAT_MODE";
 
 
 function Map(container) {
   this.mapObj = d3.select(container).append('div');
+  this.tooltip = d3.select(container).append('div').attr('class', 'mapTooltip');
+  
   this.mapPasses = {};
   this.raphaelLifts = {};
   this.raphaelPaper = new Raphael(this.mapObj[0][0], '100%', '100%');
+  this.rootPoint = this.raphaelPaper.canvas.createSVGPoint();
 
   if (selectedSkiStrategy) {
     this.updateStrategy();
@@ -277,15 +283,31 @@ Map.prototype.updateStrategy = function() {
 
   this.raphaelPaper.setViewBox(0, 0, selectedSkiStrategy.viewport.width, selectedSkiStrategy.viewport.height, false);
   this.raphaelPaper.canvas.setAttribute('preserveAspectRatio', 'xMidYMin');
+  
+  var mouseOverHandler = function () {
+    this.attr('stroke-width', '8px').attr('stroke-opacity', '0.8');
+    
+    var rect = this[0].getBoundingClientRect();
+    var lift = this.data('lift');
+    map.tooltip.style('display', 'block').html(lift.displayName).style('left', rect.left + "px").style('top', rect.top + "px");
+  };
+  
+  var mouseOutHandler = function () {
+    this.attr('stroke-width', '6px').attr('stroke-opacity', '0.8');
+    map.tooltip.style('display', 'none');
+  };
 
-  for (var liftName in selectedSkiStrategy.liftPaths) {
-    var lift = selectedSkiStrategy.liftPaths[liftName];
+  for (var liftId in selectedSkiStrategy.liftPaths) {
+    var lift = selectedSkiStrategy.liftPaths[liftId];
     var liftPath = lift.path;
 
     var raphaelPath = this.raphaelPaper.path(liftPath);
     raphaelPath.attr('stroke', lift.color).attr('stroke-width', '6px').attr('stroke-opacity', '0.8');
+    raphaelPath.data('lift', lift);
+    raphaelPath.mouseover(mouseOverHandler);
+    raphaelPath.mouseout(mouseOutHandler);
 
-    this.raphaelLifts[liftName] = raphaelPath;
+    this.raphaelLifts[liftId] = raphaelPath;
   }
 };
 
@@ -324,10 +346,9 @@ Map.prototype.updatePosition = function(date) {
 };
 
 var calculateOverlappingInfo = function(circlesWithPositions) {
-  var defaultRadius = CIRCLE_HEIGHT / 2;
   var overlappingInfo = [];
   
-  circlesWithPositions.sort(function(a, b){return lineDistance(a.point, b.point) - defaultRadius;});
+  circlesWithPositions.sort(function(a, b){return lineDistance(a.point, b.point) - CIRCLE_RADIUS;});
   
   for (var ci = 0; ci < circlesWithPositions.length; ci++) {
     var cwp = circlesWithPositions[ci];
@@ -338,7 +359,7 @@ var calculateOverlappingInfo = function(circlesWithPositions) {
 
       if (!overlapping && Math.pow(cwp.point.x - oi.area.center.x, 2) + Math.pow(cwp.point.y - oi.area.center.y, 2) < Math.pow(oi.area.radius, 2)) {
         var d = lineDistance(cwp.point, oi.area.center);
-        oi.area.radius = Math.max(oi.area.radius, d + defaultRadius);
+        oi.area.radius = Math.max(oi.area.radius, d + CIRCLE_RADIUS);
         oi.cwps.push(cwp);
         overlapping = true;
       }
@@ -348,7 +369,7 @@ var calculateOverlappingInfo = function(circlesWithPositions) {
       overlappingInfo.push({
         area: {
           center: cwp.point,
-          radius: defaultRadius
+          radius: CIRCLE_RADIUS
         },
         cwps: [cwp]
       });
@@ -359,8 +380,6 @@ var calculateOverlappingInfo = function(circlesWithPositions) {
 };
 
 var applyTransformationWithOverlapping = function(overlappingInfo) {
-  var defaultRadius = CIRCLE_HEIGHT / 2;
-  
   for (var i = 0; i < overlappingInfo.length; i++) {
    var cwps = overlappingInfo[i].cwps;
    var cwpsIndexCenter = (cwps.length - 1) / 2;
@@ -379,7 +398,7 @@ var applyTransformationWithOverlapping = function(overlappingInfo) {
        perpendicularAngle = cwp.angle + 90;
      }
      var rads = perpendicularAngle * (Math.PI / 180);
-     var length = Math.abs(defaultRadius * (j - cwpsIndexCenter));
+     var length = Math.abs(CIRCLE_RADIUS * (j - cwpsIndexCenter));
      
      point.x += length * Math.cos(rads);
      point.y += length * Math.sin(rads);
@@ -399,9 +418,25 @@ var lineDistance = function(point1, point2){
 };
 
 Map.prototype.updatePasses = function() {
+  var mouseOverHandler = function () {
+    this.attr('r', '12');
+    
+    var rect = this[0].getBoundingClientRect();
+    var stat = this.data('stat');
+    map.tooltip.style('display', 'block').html(stat.displayName).style('left', (rect.left + rect.width + TOOLTIP_PADDING) + "px").style('top', rect.top + "px");
+  };
+  
+  var mouseOutHandler = function () {
+    this.attr('r', '10');
+    map.tooltip.style('display', 'none');
+  };
+  
   var passIndex = 0;
   for (var passId in allStatsById) {
     var circle = this.raphaelPaper.circle(0, 0, CIRCLE_HEIGHT).attr("fill", passColors(passIndex));
+    circle.mouseover(mouseOverHandler);
+    circle.mouseout(mouseOutHandler);
+    circle.data('stat', allStatsById[passId]);
     circle.hide();
     this.mapPasses[passId] = circle;
     passIndex++;
@@ -427,10 +462,11 @@ LiftLegend.prototype.updateStrategy = function() {
   this.legendObj.html('');
   this.legendObj.append('legend').html('Lifts');
 
-  for (var liftName in selectedSkiStrategy.liftPaths) {
+  for (var liftId in selectedSkiStrategy.liftPaths) {
+    var lift = selectedSkiStrategy.liftPaths[liftId];
     var legendElement = this.legendObj.append('div');
-    legendElement.append('div').attr('class', 'liftPath').style('border-color', selectedSkiStrategy.liftColors[liftName]);
-    legendElement.append('div').attr('class', 'liftName').html(liftName);
+    legendElement.append('div').attr('class', 'liftPath').style('border-color', selectedSkiStrategy.liftColors[liftId]);
+    legendElement.append('div').attr('class', 'liftName').html(lift.displayName);
   }
 };
 
