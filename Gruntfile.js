@@ -8,7 +8,7 @@ module.exports = function(grunt) {
       options: {
         separator: "\n\n"
       },
-      dist: {
+      distMain: {
         src: [
           'src/_intro.js',
           'src/gantt-chart.js',
@@ -16,6 +16,12 @@ module.exports = function(grunt) {
           'src/_outro.js'
         ],
         dest: 'dist/<%= pkg.name.replace(".js", "") %>.js'
+      },
+      distStrategies: {
+        src: [
+          'src/strategies/*.js'
+        ],
+        dest: 'dist/strategies/all.js'
       }
     },
     
@@ -34,7 +40,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'dist/<%= pkg.name.replace(".js", "") %>.min.js': ['<%= concat.dist.dest %>']
+          'dist/<%= pkg.name.replace(".js", "") %>.min.js': ['<%= concat.distMain.dest %>']
         }
       }
     },

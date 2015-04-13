@@ -13,7 +13,6 @@
     "smarttabs": true,
     "globals": {
       "d3": false,
-      "Raphael": false,
-      "BASE_STRATEGY_URL": false
+      "Raphael": false
     }
 }

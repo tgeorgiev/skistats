@@ -12,32 +12,21 @@ body {
   right: 0;
 }
 
-.timeline {
+.bodyContent {
   position: absolute;
-  bottom: 40px;
-  left: 0;
-  right: 250px;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  right: 5px;
 }
 
-.timelineControls > input{
-  vertical-align: middle;
-  width: auto;
-  display: initial;
+.twitter-button-holder {
+  padding-left: 5px;
 }
 
-.timelineContainer {
-  position: relative;
-  height: 100px;
-  background-color:rgba(255,255,255,0.6);
-  border: 1px solid;
-  border-radius: 5px;
-  margin-top: 5px;
-}
-
-.x.axis path,.x.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+footer {
+  position: fixed;
+  bottom: 0;
 }
 
 .filesSelector {
@@ -84,6 +73,34 @@ body {
   text-align: center;
 }
 
+.timeline {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 250px;
+}
+
+.timelineControls > input{
+  vertical-align: middle;
+  width: auto;
+  display: initial;
+}
+
+.timelineContainer {
+  position: relative;
+  height: 100px;
+  background-color:rgba(255,255,255,0.6);
+  border: 1px solid;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.x.axis path,.x.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
 .legend rect {
   fill:white;
   stroke:black;
@@ -104,15 +121,6 @@ body {
   top: 0;
   width: 250px;
   bottom: 200px;
-}
-
-.twitter-button-holder {
-  padding-left: 10px;
-}
-
-footer {
-  position: absolute;
-  bottom: 0;
 }
 
 .lineLabel {

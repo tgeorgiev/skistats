@@ -237,6 +237,7 @@ d3.gantt = function() {
 var dateFormat = "%d/%m/%Y %H:%M";
 var dateFormatInstance = d3.time.format(dateFormat);
 var passColors = d3.scale.category10();
+var strategyBaseUrl = "";
 
 var allStatsById = {};
 
@@ -275,7 +276,12 @@ function Map(container) {
 }
 
 Map.prototype.updateStrategy = function() {
-  this.mapObj.style('background-image', 'url(' + selectedSkiStrategy.mapUrl + ')')
+  var mapUrl = selectedSkiStrategy.mapUrl;
+  if (mapUrl.indexOf('http://') == -1 && mapUrl.indexOf('https://') == -1) {
+    mapUrl = strategyBaseUrl + mapUrl;
+  }
+  
+  this.mapObj.style('background-image', 'url(' + mapUrl + ')')
     .style('background-size', 'contain')
     .style('height', '100%')
     .style('background-repeat', 'no-repeat')
@@ -465,7 +471,7 @@ LiftLegend.prototype.updateStrategy = function() {
   for (var liftId in selectedSkiStrategy.liftPaths) {
     var lift = selectedSkiStrategy.liftPaths[liftId];
     var legendElement = this.legendObj.append('div');
-    legendElement.append('div').attr('class', 'liftPath').style('border-color', selectedSkiStrategy.liftColors[liftId]);
+    legendElement.append('div').attr('class', 'liftPath').style('border-color', selectedSkiStrategy.liftPaths[liftId].color);
     legendElement.append('div').attr('class', 'liftName').html(lift.displayName);
   }
 };
@@ -579,7 +585,7 @@ Timeline.prototype.refresh = function() {
       tasks.push({
         "startDate": entry.startDate,
         "endDate": entry.endDate,
-        "taskName": fileData.displayName,
+        "taskName": key,
         "status": entry.lift
       });
 
@@ -602,7 +608,9 @@ Timeline.prototype.refresh = function() {
   this.tasks = tasks;
 
   this.gantt.taskTypes(taskNames);
-  this.gantt.taskStatusColor(selectedSkiStrategy.liftColors);
+  
+  
+  this.gantt.taskStatusColor(getLiftColors());
 
   var rangeMin = new Date(minDate.getTime() - (maxDate.getTime() - minDate.getTime()));
   var rangeMax = new Date(maxDate.getTime() + (maxDate.getTime() - minDate.getTime()));
@@ -687,6 +695,22 @@ var updateStrategy = function(strategy) {
   }
 };
 
+/**
+ * Returns the lift colors in the format (liftId, color)
+ */
+var getLiftColors = function() {
+  var liftPaths = selectedSkiStrategy.liftPaths;
+  var liftColors = {};
+  for (var key in liftPaths) {
+      liftColors[key] = liftPaths[key].color;
+  }
+  
+  return liftColors;
+};
+
+/**
+ * Return the lift entry of the given passId that includes the dateBetween.
+ */
 var getLiftEntry = function(passId, dateBetween) {
   var fileData = allStatsById[passId];
   for (var i = 0; i < fileData.entries.length; i++) {
@@ -701,9 +725,9 @@ var getLiftEntry = function(passId, dateBetween) {
 
 var recognizeStrategy = function(strategy, content, mode) {
   if (mode == CSV_STAT_MODE) {
-    return strategy.recognizeCSV(content);
+    return strategy.recognizeCSV && strategy.recognizeCSV(content);
   } else {
-    return strategy.recognizeJSON(content);
+    return strategy.recognizeJSON && strategy.recognizeJSON(content);
   }
 };
 
@@ -768,7 +792,7 @@ skistats.addJSON = function(id, json) {
   addStat(id, json, JSON_STAT_MODE);
 };
 
-skistats.addStrategy = function(strategy) {
+skistats.registerStrategy = function(strategy) {
   strategies.push(strategy);
 };
 
@@ -840,6 +864,18 @@ skistats.dateFormat = function(format) {
   dateFormatInstance = d3.time.format(dateFormat);
   return skistats;
 };
+
+skistats.strategyBaseUrl = function(value) {
+  if (!arguments.length) {
+    return strategyBaseUrl;
+  }
+  if (map) {
+    console.warn("Map was already initialized, strategyBaseUrl will not be applied.");
+  }
+  strategyBaseUrl = value;
+  return skistats;
+};
+
 
 skistats.selectedSkiStrategy = function() {
   return selectedSkiStrategy;

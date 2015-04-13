@@ -1,12 +1,24 @@
 {
   "name": "skistats",
-  "version": "0.0.0",
+  "description": "Visualization of ski pass statistics",
+  "version": "0.0.1",
   "main": "dist/skistats.min.js",
+  "authors": [
+    { "name": "Tony Georgiev", "homepage": "http://tgeorgiev.com" }
+  ],
+  "homepage": "http://tgeorgiev.github.io/skistats",
+  "license": "MIT",
   "ignore": [
-    "**/.*",
-    "node_modules",
+    ".DS_Store",
+    ".editorconfig",
+    ".gitattributes",
+    ".gitignore",
+    ".jshintrc",
     "bower_components",
-    "test"
+    "demo",
+    "Gruntfile.js",
+    "node_modules",
+    "src"
   ],
   "dependencies": {
     "d3": "~3.5.5",

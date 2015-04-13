@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>skistats demo</title>
+    <title>skistats.js</title>
     <link href='http://fonts.googleapis.com/css?family=Maven+Pro' rel='stylesheet' type='text/css'>  
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../dist/assets/skistats.css" />
     <link rel="stylesheet" type="text/css" href="assets/main.css" />
     <script>
-      var BASE_STRATEGY_URL = "../dist/strategies/";
       var HALF_DAY_MS = 43200000;
       var ONE_DAY_MS = 86400000;
       var THREE_DAYS_MS = 259200000;
@@ -16,7 +15,7 @@
     <script type="text/javascript" src="../bower_components/d3/d3.min.js"></script>
     <script type="text/javascript" src="../bower_components/raphael/raphael.js"></script>
     <script type="text/javascript" src="../dist/skistats.js"></script>
-    <script type="text/javascript" src="../dist/strategies/livigno-strategy.js"></script>
+    <script type="text/javascript" src="../dist/strategies/all.js"></script>
     <script type="text/javascript" src="assets/demostats.js"></script>
     
     <script>
@@ -38,6 +37,7 @@
           height: 100
         };
 
+        skistats.strategyBaseUrl("../dist/strategies/");
         skistats.map('.map');
         skistats.liftLegend('.lifts');
         skistats.passLegend('.passes');
@@ -104,8 +104,8 @@
       }
       
       function loadWithDemoStats() {
-        for (var i = 0; i < demostats.length; i++) {
-          skistats.addJSON(demostats[i][0].id, demostats[i]);
+        for (var key in demostats) {
+          skistats.addJSON(key, demostats[key]);
         }
         
         initializeComponents();
@@ -169,51 +169,56 @@
     </script>
   </head>
   <body onload="init()">    
-    <div class="intro">
-      <h1>skistats demo</h1>
-    
-      <p>SkiStats visualizes the raw statistics you have from your ski pass. </p>
-      <p>See the <a href="http://tgeorgiev.github.io/skistats">project homepage</a>.
-      <p>Check out the <a href="https://github.com/tgeorgiev/skistats">project repo</a>.
-      
-      <div class="filesSelector">
-        <p>To see visualization of your ski pass, add the file(s) containing the stats from your ski pass. See which Ski resorts are supported <a href="http://tgeorgiev.github.io/skistats/demo/">here</a></p>
-        <div class="filesSelectorButton">
-            <button class="btn btn-primary">Select files</button>
-            <input type="file" id="filesSelectorInput" name="files[]" multiple />
-        </div>
-        <p>or</p>
-        <div>Drop files inside</div>
-      </div>
-      <div class="loadDemoStats">
+    <div class="bodyContent">
+      <div class="intro">
+        <h1>skistats.js</h1>
+        <h2>Ski statistics visualization</h2>
+
+        <p>This is a JavaScript library for visualizing raw ski stats. It is based on D3.js and Raphael and provides data visualization components for displaying individual or collective lift run statistics. </p>
+        <p>SkiStats is open-source library, available at <a href="https://github.com/tgeorgiev/skistats">GitHub</a></p>
+        <p>It is built to support statistics from many ski resorts, using "strategies", however it is still in early development and supports stats only for <a href="https://www.livigno.eu/en/home-inverno">Livigno</a>. If you want to see you stats from other resorts visualized, see how you can help us do that - <a href="https://github.com/tgeorgiev/skistats#contributing">https://github.com/tgeorgiev/skistats#contributing</a></p>
+
+        <div class="filesSelector">
+          <p>To see visualization of your ski pass, add the file(s) containing the stats from your ski pass.</p>
+          <p>Supported resorts: Livigno</p>
+          <p>Supported file types: ".csv"</p>
+          <p>Your file will be used only locally on this page and will not be uploaded anywhere.</p>
+          <div class="filesSelectorButton">
+              <button class="btn btn-primary">Select files</button>
+              <input type="file" id="filesSelectorInput" name="files[]" multiple />
+          </div>
           <p>or</p>
-         <button class="btn btn-info">Load with demo stats from Livigno</button>
-      </div>
-      
-      <a href="https://github.com/tgeorgiev/skistats"><img style="position: absolute; top: 0; right: 0; border: 0;" src="assets/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
-    </div>
-    
-    <div class="visualization" style="display: none">
-      <div class="map">
-      </div>
-      <div class="legends">
-        <div>
-          <span class="resortName"></span><span class="resortNameHint"> stats</span>
+          <div>Drop files inside</div>
         </div>
-        <div class="lifts"></div>
-        <div class="passes"></div>
-      </div>
-      <div class="timeline">
-        <div class="timelineControls">
-          <button id="zoomHalfDay" class="btn btn-default">Half Day</button>
-          <button id="zoomDay" class="btn btn-default ">Day</button>
-          <button id="zoom3Days" class="btn btn-default">3 Days</button>
-          <button id="zoomWeek" class="btn btn-default">Week</button>
-          <input id="zoomSlider" type="range">
+        <div class="loadDemoStats">
+            <p>or</p>
+           <button class="btn btn-info">Load with demo stats from Livigno</button>
         </div>
       </div>
+
+      <div class="visualization" style="display: none">
+        <div class="map">
+        </div>
+        <div class="legends">
+          <div>
+            <span class="resortName"></span><span class="resortNameHint"> stats</span>
+          </div>
+          <div class="lifts"></div>
+          <div class="passes"></div>
+        </div>
+        <div class="timeline">
+          <div class="timelineControls">
+            <button id="zoomHalfDay" class="btn btn-default">Half Day</button>
+            <button id="zoomDay" class="btn btn-default ">Day</button>
+            <button id="zoom3Days" class="btn btn-default">3 Days</button>
+            <button id="zoomWeek" class="btn btn-default">Week</button>
+            <input id="zoomSlider" type="range">
+          </div>
+        </div>
+      </div>
     </div>
     
+    <a href="https://github.com/tgeorgiev/skistats"><img style="position: absolute; top: 0; right: 0; border: 0;" src="assets/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
   </body>
   
   <footer>
