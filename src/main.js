@@ -275,6 +275,7 @@ var addPassChangeHandlers = function(displayElement, editElement, model) {
     var editElementDom = editElement[0][0];
     editElementDom.value = model.displayName;
     editElementDom.focus();
+    editElementDom.setSelectionRange(0, editElementDom.value.length);
   });
 
   var onValueChange = function() {
