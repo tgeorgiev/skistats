@@ -23,7 +23,6 @@ d3.gantt = function() {
   var timeDomainEnd;
   var taskTypes = [];
   var taskStatusColor = [];
-  var displayedTasks;
 
   var tickFormat = "%d/%m/%Y %H:%M";
   var yTickFormatMapper;
@@ -34,6 +33,10 @@ d3.gantt = function() {
 
   var rectTransform = function(d) {
     return "translate(" + x(d.startDate) + "," + y(d.taskName) + ")";
+  };
+  
+  var rectWidth = function(d) {
+    return (x(d.endDate) - x(d.startDate));
   };
 
   var x = d3.time.scale().clamp(true);
@@ -65,7 +68,7 @@ d3.gantt = function() {
 
     svg.append("g").attr("class", "x axis");
     svg.append("g").attr("class", "y axis");
-    
+
     x.range([0, width]);
       y.rangeRoundBands([0, height], .1);
       
@@ -101,47 +104,43 @@ d3.gantt = function() {
   }
 
   gantt.redraw = function(tasks, transition) {
-    if (tasks) {
-      displayedTasks = tasks;
-    }
-    var rect = gantt.getChartGroup().selectAll("rect").data(displayedTasks, keyFunction);
+    var rect = gantt.getChartGroup().selectAll("rect").data(tasks, keyFunction);
+
     rect.enter()
-      .insert ("rect", '.axis')
-      .attr("rx", 5)
-      .attr("ry", 5)
-      .attr("stroke", function(d) {
-        if (!taskStatusColor[d.status]) {
-          return "";
-        }
-        return taskStatusColor[d.status];
-      })
-      .attr("fill", function(d) {
-        if (!taskStatusColor[d.status]) {
-          return "";
-        }
-        return taskStatusColor[d.status];
-      })
-      .transition()
-      .attr("y", 0)
-      .attr("transform", rectTransform)
-	 .attr("height", function(d) { return y.rangeBand(); })
-      .attr("width", function(d) {
-        return (x(d.endDate) - x(d.startDate));
-      });
-
-        //rect.transition()
-          rect.attr("transform", rectTransform)
-	 .attr("height", function(d) { return y.rangeBand(); })
-      .attr("width", function(d) {
-        return (x(d.endDate) - x(d.startDate));
-      });
-
+    .insert ("rect", '.axis')
+    .attr("rx", 5)
+    .attr("ry", 5)
+    .attr("stroke", function(d) {
+      if (!taskStatusColor[d.status]) {
+        return "";
+      }
+      return taskStatusColor[d.status];
+    })
+    .attr("fill", function(d) {
+      if (!taskStatusColor[d.status]) {
+        return "";
+      }
+      return taskStatusColor[d.status];
+    })
+    .transition()
+    .attr("y", 0)
+    .attr("transform", rectTransform)
+    .attr("height", function(d) { return y.rangeBand(); })
+    .attr("width", rectWidth);
     rect.exit().remove();
     
     gantt.updateXAxis(transition); 
     gantt.updateYAxis(transition);
 
     return gantt;
+  };
+  
+  gantt.zoomed = function() {
+    gantt.getChartGroup().select(".x.axis").call(xAxis);
+    gantt.getChartGroup().select(".y.axis").call(yAxis);
+    gantt.getChartGroup().selectAll('rect')
+      .attr("transform", rectTransform)
+      .attr("width", rectWidth);
   };
 
   gantt.margin = function(value) {
