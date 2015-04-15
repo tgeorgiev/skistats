@@ -95,10 +95,10 @@ footer .twitter-button-holder {
   right: 250px;
 }
 
-.timelineControls > input{
+.timelineControls .sliderHolder {
+  width: 200px;
+  display: inline-block;
   vertical-align: middle;
-  width: auto;
-  display: initial;
 }
 
 .timelineContainer {
