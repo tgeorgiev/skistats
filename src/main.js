@@ -390,10 +390,8 @@ Timeline.prototype.refresh = function() {
     .x(thisGantt.getX())
     .scaleExtent([1, 200])
     .on("zoom", function() {
-      thisGantt.redraw(tasks);
-
+      thisGantt.zoomed();
       that.updatePosition();
-    
       dispatcher.zoom(that.zoom.scale());
     });
 
@@ -437,7 +435,7 @@ Timeline.prototype.zoomCentered = function(scale) {
   
   dispatcher.zoom(this.zoom.scale());
   
-  this.gantt.redraw(this.tasks);
+  this.gantt.zoomed();
 };
 
 Timeline.prototype.zoomIntervalMs = function(intervalMilliseconds) {

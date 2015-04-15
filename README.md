@@ -6,25 +6,35 @@ See the [project homepage and demo](http://tgeorgiev.github.io/skistats).
 
 ## About
 
-This is a JavaScript library for visualizing raw ski stats. It is based on D3.js and Raphael and provides data visualization components for displaying individual or collective lift run statistics.
+This is a JavaScript library for visualizing raw ski stats. It is based on [D3.js](http://d3js.org/) and [Raphael](http://raphaeljs.com) and provides data visualization components for displaying individual or collective lift run statistics.
 
-The main components it consists of and exposes are:
+The main components it exposes:
 
-* Map
+### Map
 
-The Map component is used to display map of a ski resort, with interactive SVG elements of the ski lifts and can display the participants riding a lift. See Timeline
+![Alt text](/docs/assets/map-component.jpg?raw=true)
 
-* Timeline
+The Map component is used to display map of a ski resort, with interactive SVG elements of the ski lifts and can display the participants riding a lift at a given time. The map component can be used standalone, to provide users an interactive display of a resort map. If used with the [timeline](#timeline) can provide even richer experience showing participants riding a lift at the current time.
 
-The Timeline component displays all registered lift runs. It useful for camparing multiple enties, from different ski passes. It is interactive, supports zooming and panning, and is integrated with the Map component. When moving through lift run entries, the map will update the entries on the lift paths.
+### Timeline
 
-* Lift legend
+![Alt text](/docs/assets/timeline-component.jpg?raw=true)
 
-Shows a legend of the ski lifts - color and display name.
+The Timeline component displays all registered lift runs. It is used to show a timeline of all entries with timeblock representing the participants riding different lifts. Supports zooming and panning, for digging in greater detail. 
 
-* Passes legend
+Can be used standalone.  If used with the [map](#map) can provide even richer experience showing participants riding a lift at the current time.
 
-Shows a legend of the ski passes - color of the ski pass and display name. The display name can be changed, if the use clicks on the name. When changed, the name will also be applied on the Timeline and Map.
+### Lift legend
+
+![Alt text](/docs/assets/lift-legend-component.jpg?raw=true)
+
+Shows a legend of the ski lifts - color and display name. Useful to be used with the [map](#map) and/or [timeline](#timeline)
+
+### Passes legend
+
+![Alt text](/docs/assets/pass-legend-component.jpg?raw=true)
+
+Shows a legend of the ski passes - color of the ski pass and display name. The display name is editable. When changed, the name will also be applied on the [timeline](#timeline) and [map](#map).
 
 ## Installation
 
@@ -78,7 +88,7 @@ It will be great if you can help us improve it. You can do it in the following w
 * Fork and contribute to the main skistats.js library
 * Report issues and feature requests
 * Open a [new issue](https://github.com/tgeorgiev/skistats/issues/new) and specify which resort you want to see visualizations for. Please also provide the stats you have for your ski pass, in order to 
-* Contribute by creating a new strategy, to introduce support for new resort. Fork the project, see one of the available strategies to create yours and create pull request
+* Contribute by creating a new strategy, to introduce support for new resort. Instructions on how to create a new strategy can be found [here](https://github.com/tgeorgiev/skistats/tree/master/src/strategies#create-a-new-strategy)
 
 ## License
 
