@@ -103,7 +103,7 @@ d3.gantt = function() {
     return xAxis;
   }
 
-  gantt.redraw = function(tasks, transition) {
+  gantt.redraw = function(tasks) {
     var rect = gantt.getChartGroup().selectAll("rect").data(tasks, keyFunction);
 
     rect.enter()
@@ -129,18 +129,23 @@ d3.gantt = function() {
     .attr("width", rectWidth);
     rect.exit().remove();
     
-    gantt.updateXAxis(transition); 
-    gantt.updateYAxis(transition);
+    gantt.updateXAxis(false); 
+    gantt.updateYAxis(false);
 
     return gantt;
   };
   
-  gantt.zoomed = function() {
-    gantt.getChartGroup().select(".x.axis").call(xAxis);
-    gantt.getChartGroup().select(".y.axis").call(yAxis);
-    gantt.getChartGroup().selectAll('rect')
-      .attr("transform", rectTransform)
-      .attr("width", rectWidth);
+  gantt.zoomed = function(transition) {
+    gantt.updateXAxis(transition);
+    gantt.updateYAxis(transition);
+    
+    var rect = gantt.getChartGroup().selectAll('rect');
+    
+    if (transition) {
+      rect = rect.transition();
+    }
+    
+    rect.attr("transform", rectTransform).attr("width", rectWidth);
   };
 
   gantt.margin = function(value) {
@@ -207,7 +212,7 @@ d3.gantt = function() {
   gantt.updateXAxis = function(transition) {
     var select = gantt.getChartGroup().select(".x.axis");
     if (transition) {
-      select.transition();
+      select = select.transition();
     }
     select.call(xAxis);  
   }
@@ -215,7 +220,7 @@ d3.gantt = function() {
   gantt.updateYAxis = function(transition) {
     var select = gantt.getChartGroup().select(".y.axis");
     if (transition) {
-      select.transition();
+      select = select.transition();
     }
     select.call(yAxis); 
   };
