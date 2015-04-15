@@ -108,7 +108,7 @@ d3.gantt = function() {
     return xAxis;
   }
 
-  gantt.redraw = function(tasks, transition) {
+  gantt.redraw = function(tasks) {
     var rect = gantt.getChartGroup().selectAll("rect").data(tasks, keyFunction);
 
     rect.enter()
@@ -134,18 +134,23 @@ d3.gantt = function() {
     .attr("width", rectWidth);
     rect.exit().remove();
     
-    gantt.updateXAxis(transition); 
-    gantt.updateYAxis(transition);
+    gantt.updateXAxis(false); 
+    gantt.updateYAxis(false);
 
     return gantt;
   };
   
-  gantt.zoomed = function() {
-    gantt.getChartGroup().select(".x.axis").call(xAxis);
-    gantt.getChartGroup().select(".y.axis").call(yAxis);
-    gantt.getChartGroup().selectAll('rect')
-      .attr("transform", rectTransform)
-      .attr("width", rectWidth);
+  gantt.zoomed = function(transition) {
+    gantt.updateXAxis(transition);
+    gantt.updateYAxis(transition);
+    
+    var rect = gantt.getChartGroup().selectAll('rect');
+    
+    if (transition) {
+      rect = rect.transition();
+    }
+    
+    rect.attr("transform", rectTransform).attr("width", rectWidth);
   };
 
   gantt.margin = function(value) {
@@ -212,7 +217,7 @@ d3.gantt = function() {
   gantt.updateXAxis = function(transition) {
     var select = gantt.getChartGroup().select(".x.axis");
     if (transition) {
-      select.transition();
+      select = select.transition();
     }
     select.call(xAxis);  
   }
@@ -220,7 +225,7 @@ d3.gantt = function() {
   gantt.updateYAxis = function(transition) {
     var select = gantt.getChartGroup().select(".y.axis");
     if (transition) {
-      select.transition();
+      select = select.transition();
     }
     select.call(yAxis); 
   };
@@ -652,7 +657,7 @@ Timeline.prototype.updatePosition = function() {
   }
 };
 
-Timeline.prototype.zoomCentered = function(scale) {
+Timeline.prototype.zoomCentered = function(scale, transition) {
   var currentTranslate = this.zoom.translate()[0];
   var currentScale = this.zoom.scale();
   
@@ -668,17 +673,17 @@ Timeline.prototype.zoomCentered = function(scale) {
   
   dispatcher.zoom(this.zoom.scale());
   
-  this.gantt.zoomed();
+  this.gantt.zoomed(transition);
 };
 
-Timeline.prototype.zoomIntervalMs = function(intervalMilliseconds) {
+Timeline.prototype.zoomIntervalMs = function(intervalMilliseconds, transition) {
   var currentScale = this.zoom.scale();
   var currentBeginDate = this.gantt.getX().invert(0);
   var currentEndDate = this.gantt.getX().invert(this.gantt.viewport().width);
   
   var percentage = (currentEndDate - currentBeginDate) / intervalMilliseconds;
   
-  this.zoomCentered(currentScale * percentage);
+  this.zoomCentered(currentScale * percentage, transition);
 };
 
 var updateStrategy = function(strategy) {
@@ -828,15 +833,15 @@ timelineContext.getZoomContext = function() {
   }
 };
 
-timelineContext.zoomCentered = function(scale) {
+timelineContext.zoomCentered = function(scale, transition) {
   if (timeline) {
-    timeline.zoomCentered(scale);
+    timeline.zoomCentered(scale, transition);
   }
 };
 
-timelineContext.zoomIntervalMs = function(intervalMilliseconds) {
+timelineContext.zoomIntervalMs = function(intervalMilliseconds, transition) {
   if (timeline) {
-    timeline.zoomIntervalMs(intervalMilliseconds);
+    timeline.zoomIntervalMs(intervalMilliseconds, transition);
   }
 };
 

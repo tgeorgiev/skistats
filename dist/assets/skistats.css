@@ -1,3 +1,7 @@
+.map {
+  overflow: hidden;
+}
+
 .liftLegend {
 }
 
@@ -27,7 +31,7 @@
 .passLegend .passName, .passLegend .passNameEdit {
 }
 
-.timelineContainer {
+.timelineContainer .chart {
   cursor: move;
 }
 

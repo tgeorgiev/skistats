@@ -90,15 +90,20 @@ footer .twitter-button-holder {
 
 .timeline {
   position: absolute;
-  bottom: 40px;
+  bottom: 60px;
   left: 0;
   right: 250px;
 }
 
 .timelineControls .sliderHolder {
-  width: 200px;
-  display: inline-block;
-  vertical-align: middle;
+  width: 265px;
+  margin: 5px;
+}
+
+.timelineControls .sliderHolder input {
+  /* IE fix */
+  padding: 0;
+  margin: 0;
 }
 
 .timelineContainer {
@@ -126,7 +131,7 @@ footer .twitter-button-holder {
   position: absolute;
   left: 0;
   top: 0;
-  bottom: 170px;
+  bottom: 180px;
   right: 250px;
 }
 

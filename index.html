@@ -80,12 +80,6 @@
         for (var i = 0; i < files.length; i++) {
           var file = files[i];
 
-          // Only process csv files.
-          if (!file.type.match('text/csv')) {
-            filesToLoad--;
-            continue;
-          }
-
           var reader = new FileReader();
 
           // Closure to capture the file information.
@@ -144,24 +138,26 @@
         
         // Setup the zoom option listeners.
         d3.select('#zoomHalfDay').on('click', function() {
-          timeline.zoomIntervalMs(HALF_DAY_MS);
+          timeline.zoomIntervalMs(HALF_DAY_MS, true);
         });
         
         d3.select('#zoomDay').on('click', function() {
-          timeline.zoomIntervalMs(ONE_DAY_MS);
+          timeline.zoomIntervalMs(ONE_DAY_MS, true);
         });
         
         d3.select('#zoom3Days').on('click', function() {
-          timeline.zoomIntervalMs(THREE_DAYS_MS);
+          timeline.zoomIntervalMs(THREE_DAYS_MS, true);
         });
         
         d3.select('#zoomWeek').on('click', function() {
-          timeline.zoomIntervalMs(WEEK_MS);
+          timeline.zoomIntervalMs(WEEK_MS, true);
         });
         
-        d3.select('#zoomSlider').on('input', function() {
-          timeline.zoomCentered(d3.select(this).property("value"));
-        });
+        var updateZoomFromSliderValue = function() {
+          timeline.zoomCentered(d3.select(this).property("value"), false);
+        };
+        
+        d3.select('#zoomSlider').on('change', updateZoomFromSliderValue).on('input', updateZoomFromSliderValue);
         
         // Setup the twitter button.
         window.twttr=(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],t=window.twttr||{};if(d.getElementById(id))return;js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);t._e=[];t.ready=function(f){t._e.push(f);};return t;}(document,"script","twitter-wjs"));
@@ -180,7 +176,7 @@
 
         <div class="filesSelector">
           <p>To see visualization of your ski pass, add the file(s) containing the stats from your ski pass.</p>
-          <p>Supported file types: ".csv"</p>
+          <p>Supported types: Livigno ".csv"</p>
           <p>Your file will be used only locally on this page and will not be uploaded anywhere.</p>
           <div class="filesSelectorButton">
               <button class="btn btn-primary">Select files</button>

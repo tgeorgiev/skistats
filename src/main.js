@@ -419,7 +419,7 @@ Timeline.prototype.updatePosition = function() {
   }
 };
 
-Timeline.prototype.zoomCentered = function(scale) {
+Timeline.prototype.zoomCentered = function(scale, transition) {
   var currentTranslate = this.zoom.translate()[0];
   var currentScale = this.zoom.scale();
   
@@ -435,17 +435,17 @@ Timeline.prototype.zoomCentered = function(scale) {
   
   dispatcher.zoom(this.zoom.scale());
   
-  this.gantt.zoomed();
+  this.gantt.zoomed(transition);
 };
 
-Timeline.prototype.zoomIntervalMs = function(intervalMilliseconds) {
+Timeline.prototype.zoomIntervalMs = function(intervalMilliseconds, transition) {
   var currentScale = this.zoom.scale();
   var currentBeginDate = this.gantt.getX().invert(0);
   var currentEndDate = this.gantt.getX().invert(this.gantt.viewport().width);
   
   var percentage = (currentEndDate - currentBeginDate) / intervalMilliseconds;
   
-  this.zoomCentered(currentScale * percentage);
+  this.zoomCentered(currentScale * percentage, transition);
 };
 
 var updateStrategy = function(strategy) {
@@ -595,15 +595,15 @@ timelineContext.getZoomContext = function() {
   }
 };
 
-timelineContext.zoomCentered = function(scale) {
+timelineContext.zoomCentered = function(scale, transition) {
   if (timeline) {
-    timeline.zoomCentered(scale);
+    timeline.zoomCentered(scale, transition);
   }
 };
 
-timelineContext.zoomIntervalMs = function(intervalMilliseconds) {
+timelineContext.zoomIntervalMs = function(intervalMilliseconds, transition) {
   if (timeline) {
-    timeline.zoomIntervalMs(intervalMilliseconds);
+    timeline.zoomIntervalMs(intervalMilliseconds, transition);
   }
 };
 
