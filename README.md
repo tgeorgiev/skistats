@@ -12,9 +12,13 @@ The main components it exposes:
 
 ### Map
 
+![Alt text](/docs/assets/map-component.jpg?raw=true)
+
 The Map component is used to display map of a ski resort, with interactive SVG elements of the ski lifts and can display the participants riding a lift at a given time. The map component can be used standalone, to provide users an interactive display of a resort map. If used with the [timeline](#timeline) can provide even richer experience showing participants riding a lift at the current time.
 
 ### Timeline
+
+![Alt text](/docs/assets/timeline-component.jpg?raw=true)
 
 The Timeline component displays all registered lift runs. It is used to show a timeline of all entries with timeblock representing the participants riding different lifts. Supports zooming and panning, for digging in greater detail. 
 
@@ -22,9 +26,13 @@ Can be used standalone.  If used with the [map](#map) can provide even richer ex
 
 ### Lift legend
 
+![Alt text](/docs/assets/lift-legend-component.jpg?raw=true)
+
 Shows a legend of the ski lifts - color and display name. Useful to be used with the [map](#map) and/or [timeline](#timeline)
 
 ### Passes legend
+
+![Alt text](/docs/assets/pass-legend-component.jpg?raw=true)
 
 Shows a legend of the ski passes - color of the ski pass and display name. The display name is editable. When changed, the name will also be applied on the [timeline](#timeline) and [map](#map).
 
