@@ -58,7 +58,7 @@
 
         d3.select('.resortName').html(skistats.selectedSkiStrategy().name);
 
-        var text = 'I just saw a ski statistics visualization of my ski pass from ' + skistats.selectedSkiStrategy().name + '!';
+        var text = 'Cool visualization of my ski pass statistics from ' + skistats.selectedSkiStrategy().name + '!';
         var twitterButtonHTML = "<a class='twitter-share-button' href='https://twitter.com/share' data-related='maverix7' data-url='http://tgeorgiev.github.io/skistats' data-text='" + text + "' data-size='large'>Tweet</a>";
 
         d3.select('.twitter-button-holder').html(twitterButtonHTML);
@@ -226,7 +226,7 @@
       <a class="twitter-share-button" href="https://twitter.com/share"
         data-related="maverix7"
         data-url="http://tgeorgiev.github.io/skistats"
-        data-text="Visualize your Ski Statistics"
+        data-text="Visualize your ski statistics using skistats.js"
         data-size="large">Tweet</a>
     </div>
   </footer>

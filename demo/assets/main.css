@@ -119,8 +119,9 @@ footer {
   position: absolute;
   right: 0;
   top: 0;
-  width: 250px;
-  bottom: 200px;
+  bottom: 0;
+  width: 245px;
+  overflow: auto;
 }
 
 .lineLabel {
