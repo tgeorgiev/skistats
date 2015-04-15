@@ -116,11 +116,11 @@
       }
       
       function handleDragEnter() {
-        d3.select('.filesSelector').style('background-color', 'rgb(210, 233, 255)');
+        d3.select('.filesSelector').classed('filesSelector-active', true);
       }
       
       function handleDragLeave() {
-        d3.select('.filesSelector').style('background-color', '');
+        d3.select('.filesSelector').classed('filesSelector-active', false);
       }
       
       function init() {
@@ -180,7 +180,6 @@
 
         <div class="filesSelector">
           <p>To see visualization of your ski pass, add the file(s) containing the stats from your ski pass.</p>
-          <p>Supported resorts: Livigno</p>
           <p>Supported file types: ".csv"</p>
           <p>Your file will be used only locally on this page and will not be uploaded anywhere.</p>
           <div class="filesSelectorButton">
@@ -222,6 +221,10 @@
   </body>
   
   <footer>
+    <div class="authorship">
+      Implemented by <a href="https://twitter.com/maverix7">Tony Georgiev</a>. 
+      Inspired by <a href="https://www.livigno.eu/en/home-inverno"><img src="assets/LivignoResortLogo.png" class="livignoLogo"></a>
+    </div>
     <div class="twitter-button-holder">
       <a class="twitter-share-button" href="https://twitter.com/share"
         data-related="maverix7"

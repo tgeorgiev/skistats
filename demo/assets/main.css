@@ -20,13 +20,24 @@ body {
   right: 5px;
 }
 
-.twitter-button-holder {
-  padding-left: 5px;
-}
-
 footer {
   position: fixed;
   bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+footer .authorship {
+  margin-left: 5px;
+  float: left;
+}
+
+footer .twitter-button-holder {
+  float: right;
+}
+
+.livignoLogo {
+  height: 30px;
 }
 
 .filesSelector {
@@ -36,7 +47,11 @@ footer {
   border-radius: 5px;
   padding: 25px;
   text-align: center;
-  background-color: rgb(237, 237, 237);
+  background-color: #EDEDED;
+}
+
+.filesSelector-active {
+  background-color: #D2E9FF;
 }
 
 .filesSelector p {
@@ -125,9 +140,9 @@ footer {
 }
 
 .lineLabel {
-  width: 150px;
+  width: 140px;
   bottom: -38px;
-  left: -80px;
+  left: -70px;
 }
 
 .resortNameHint {

@@ -19,7 +19,7 @@ module.exports = function(grunt) {
       },
       distStrategies: {
         src: [
-          'src/strategies/*.js'
+          'src/strategies/*/*.js'
         ],
         dest: 'dist/strategies/all.js'
       }

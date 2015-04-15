@@ -151,7 +151,7 @@
       return json;
     },
     liftPaths: liftPaths,
-    mapUrl: 'assets/livigno-map.png',
+    mapUrl: 'livigno/livigno-map.png',
     viewport: {
       width: 1130,
       height: 810

@@ -130,7 +130,6 @@
       return entries && entries.length > 0 && entries[0].resort === 'Livigno-SK';
     },
     retrieveEntriesCSV: function(textContent) {
-      var sjsjdjsdj;
       return d3.csv.parse(textContent, function(d) {
         var startDate = parseDate(d.date);
         var verticalRise = parseFloat(d.disl);
@@ -152,7 +151,7 @@
       return json;
     },
     liftPaths: liftPaths,
-    mapUrl: 'assets/livigno-map.png',
+    mapUrl: 'livigno/livigno-map.png',
     viewport: {
       width: 1130,
       height: 810
